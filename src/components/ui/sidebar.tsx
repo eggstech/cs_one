@@ -7,7 +7,7 @@ import { PanelLeft } from "lucide-react"
 
 import { useIsMobile } from "@/hooks/use-mobile"
 import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
+import { Button, ButtonProps } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
 import { Sheet, SheetContent } from "@/components/ui/sheet"
@@ -535,11 +535,10 @@ const sidebarMenuButtonVariants = cva(
 
 const SidebarMenuButton = React.forwardRef<
   HTMLButtonElement,
-  React.ComponentProps<"button"> & {
-    asChild?: boolean
+  ButtonProps & {
     isActive?: boolean
     tooltip?: string | React.ComponentProps<typeof TooltipContent>
-  } & VariantProps<typeof sidebarMenuButtonVariants>
+  }
 >(
   (
     {
@@ -553,16 +552,18 @@ const SidebarMenuButton = React.forwardRef<
     },
     ref
   ) => {
-    const Comp = asChild ? Slot : "button"
     const { isMobile, state } = useSidebar()
 
     const button = (
-      <Comp
+      <Button
         ref={ref}
         data-sidebar="menu-button"
         data-size={size}
         data-active={isActive}
+        variant={variant}
+        size={size}
         className={cn(sidebarMenuButtonVariants({ variant, size }), className)}
+        asChild={asChild}
         {...props}
       />
     )

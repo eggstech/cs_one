@@ -29,11 +29,11 @@ export default function CustomerProfilePage({ params }: { params: { customerId: 
     <div className="flex-1 space-y-4 p-8 pt-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Link href="/dashboard">
-            <Button variant="outline" size="icon" aria-label="Back to dashboard">
+          <Button variant="outline" size="icon" aria-label="Back to dashboard" asChild>
+            <Link href="/dashboard">
               <ArrowLeft className="h-4 w-4" />
-            </Button>
-          </Link>
+            </Link>
+          </Button>
           <div className="flex items-center gap-4">
             <Avatar className="h-16 w-16 border-2 border-primary">
               <AvatarImage src={customer.avatarUrl} alt={customer.name} data-ai-hint="person face" />

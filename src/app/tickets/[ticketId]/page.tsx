@@ -25,7 +25,7 @@ import {
   Send,
 } from "lucide-react";
 import Link from "next/link";
-import { InteractionTimelineItem } from "@/components/customers/interaction-timeline";
+import { InteractionTimelineItem } from "@/components/customers/interaction-timeline-item";
 import {
   Select,
   SelectContent,
@@ -34,6 +34,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { agents } from "@/lib/data";
+import { Label } from "@/components/ui/label";
 
 
 export default function TicketDetailPage({ params }: { params: { ticketId: string } }) {
@@ -46,11 +47,11 @@ export default function TicketDetailPage({ params }: { params: { ticketId: strin
   return (
     <div className="flex-1 space-y-4 p-8 pt-6">
       <div className="flex items-center space-x-4">
-        <Link href="/tickets">
-          <Button variant="outline" size="icon">
+        <Button variant="outline" size="icon" asChild>
+          <Link href="/tickets">
             <ArrowLeft className="h-4 w-4" />
-          </Button>
-        </Link>
+          </Link>
+        </Button>
         <div>
           <h1 className="text-3xl font-bold tracking-tight">
             Ticket <span className="font-mono text-primary">{ticket.id}</span>
@@ -157,8 +158,3 @@ export default function TicketDetailPage({ params }: { params: { ticketId: strin
     </div>
   );
 }
-
-// Dummy Label to prevent build error
-const Label = (props: React.LabelHTMLAttributes<HTMLLabelElement>) => (
-  <label {...props} />
-);

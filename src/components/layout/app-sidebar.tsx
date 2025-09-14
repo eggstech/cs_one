@@ -44,37 +44,40 @@ export function AppSidebar() {
       <SidebarContent className="p-2">
         <SidebarMenu>
           <SidebarMenuItem>
-            <Link href="/dashboard" legacyBehavior passHref>
-              <SidebarMenuButton
-                isActive={pathname === '/dashboard'}
-                tooltip="Dashboard"
-              >
+            <SidebarMenuButton
+              asChild
+              isActive={pathname === '/dashboard'}
+              tooltip="Dashboard"
+            >
+              <Link href="/dashboard">
                 <LayoutDashboard />
                 <span>Dashboard</span>
-              </SidebarMenuButton>
-            </Link>
+              </Link>
+            </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
-            <Link href="/tickets" legacyBehavior passHref>
-              <SidebarMenuButton
-                isActive={pathname.startsWith('/tickets')}
-                tooltip="Tickets"
-              >
+            <SidebarMenuButton
+              asChild
+              isActive={pathname.startsWith('/tickets')}
+              tooltip="Tickets"
+            >
+              <Link href="/tickets">
                 <Ticket />
                 <span>Tickets</span>
-              </SidebarMenuButton>
-            </Link>
+              </Link>
+            </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
-            <Link href="/merge" legacyBehavior passHref>
-              <SidebarMenuButton
-                isActive={pathname === '/merge'}
-                tooltip="Merge Profiles"
-              >
+            <SidebarMenuButton
+              asChild
+              isActive={pathname === '/merge'}
+              tooltip="Merge Profiles"
+            >
+              <Link href="/merge">
                 <GitMerge />
                 <span>Merge Profiles</span>
-              </SidebarMenuButton>
-            </Link>
+              </Link>
+            </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarContent>
@@ -82,12 +85,12 @@ export function AppSidebar() {
          <Separator className="my-2 bg-border/50" />
          <SidebarMenu>
             <SidebarMenuItem>
-              <Link href="#" legacyBehavior passHref>
-                <SidebarMenuButton tooltip="Settings">
+              <SidebarMenuButton asChild tooltip="Settings">
+                <Link href="#">
                   <Settings />
                   <span>Settings</span>
-                </SidebarMenuButton>
-              </Link>
+                </Link>
+              </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
           <div className="flex items-center gap-3 p-2 rounded-lg bg-card mt-2">
