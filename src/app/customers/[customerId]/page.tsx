@@ -18,6 +18,7 @@ import { InteractionTimeline } from "@/components/customers/interaction-timeline
 import { Badge } from "@/components/ui/badge";
 import { TicketHistory } from "@/components/customers/ticket-history";
 import { DebtHistoryCard } from "@/components/customers/debt-history-card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function CustomerProfilePage({ params }: { params: { customerId: string } }) {
   const customer = getCustomer(params.customerId);
@@ -61,12 +62,7 @@ export default function CustomerProfilePage({ params }: { params: { customerId: 
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
-        {/* Center Column (Main) */}
-        <div className="lg:col-span-2 space-y-6">
-          <InteractionTimeline interactions={customer.interactions} />
-        </div>
-
-        {/* Right Column */}
+        {/* Left Column (Details) */}
         <div className="lg:col-span-1 space-y-6">
             <Card>
                 <CardHeader>
@@ -107,12 +103,35 @@ export default function CustomerProfilePage({ params }: { params: { customerId: 
             </Card>
 
             <LinkedIdentities identities={customer.identities} />
+        </div>
+        
+        {/* Right Column (Tabs) */}
+        <div className="lg:col-span-2">
+          <Tabs defaultValue="timeline">
+            <TabsList className="mb-4">
+              <TabsTrigger value="timeline">Timeline</TabsTrigger>
+              <TabsTrigger value="tickets">Tickets</TabsTrigger>
+              <TabsTrigger value="orders">Orders</TabsTrigger>
+              <TabsTrigger value="profile">Profile Details</TabsTrigger>
+            </TabsList>
             
-            {customer.eyeMeasurement && <EyeMeasurementCard measurement={customer.eyeMeasurement} />}
-
-            <TicketHistory tickets={customerTickets} />
-            <OrderHistory orders={customer.orders} />
-            {customer.debt && <DebtHistoryCard debt={customer.debt} />}
+            <TabsContent value="timeline">
+              <InteractionTimeline interactions={customer.interactions} />
+            </TabsContent>
+            
+            <TabsContent value="tickets">
+              <TicketHistory tickets={customerTickets} />
+            </TabsContent>
+            
+            <TabsContent value="orders">
+              <OrderHistory orders={customer.orders} />
+            </TabsContent>
+            
+            <TabsContent value="profile" className="space-y-6">
+              {customer.eyeMeasurement && <EyeMeasurementCard measurement={customer.eyeMeasurement} />}
+              {customer.debt && <DebtHistoryCard debt={customer.debt} />}
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
     </div>
