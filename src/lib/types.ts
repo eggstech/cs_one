@@ -47,6 +47,12 @@ export type EyeMeasurement = {
   pd: string;
 };
 
+export type DebtHistoryItem = {
+    date: string;
+    amount: number;
+    reason: string;
+};
+
 export type Customer = {
   id: string;
   name: string;
@@ -59,6 +65,15 @@ export type Customer = {
   orders: Order[];
   eyeMeasurement?: EyeMeasurement;
   tags: string[];
+  membership?: {
+    level: 'Bronze' | 'Silver' | 'Gold';
+    points: number;
+    nextLevelPoints: number;
+  };
+  debt?: {
+    current: number;
+    history: DebtHistoryItem[];
+  };
 };
 
 export type Ticket = {

@@ -74,6 +74,18 @@ export const customers: Customer[] = [
       pd: '63',
     },
     tags: ['VIP', 'Repeat Customer'],
+    membership: {
+      level: 'Gold',
+      points: 2500,
+      nextLevelPoints: 5000,
+    },
+    debt: {
+        current: 50.25,
+        history: [
+            { date: '2024-07-01T10:00:00Z', amount: 100.00, reason: 'Initial Debt' },
+            { date: '2024-07-15T12:00:00Z', amount: -49.75, reason: 'Partial Payment' }
+        ]
+    }
   },
   {
     id: 'cus-2',
@@ -107,6 +119,15 @@ export const customers: Customer[] = [
       },
     ],
     tags: ['New Customer'],
+    membership: {
+        level: 'Bronze',
+        points: 50,
+        nextLevelPoints: 500
+    },
+    debt: {
+        current: 0,
+        history: []
+    }
   },
   {
     id: 'cus-3',

@@ -18,6 +18,8 @@ import { EyeMeasurementCard } from "@/components/customers/eye-measurement-card"
 import { InteractionTimeline } from "@/components/customers/interaction-timeline";
 import { Badge } from "@/components/ui/badge";
 import { TicketHistory } from "@/components/customers/ticket-history";
+import { MembershipCard } from "@/components/customers/membership-card";
+import { DebtHistoryCard } from "@/components/customers/debt-history-card";
 
 export default function CustomerProfilePage({ params }: { params: { customerId: string } }) {
   const customer = getCustomer(params.customerId);
@@ -33,7 +35,7 @@ export default function CustomerProfilePage({ params }: { params: { customerId: 
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Button variant="outline" size="icon" aria-label="Back to dashboard" asChild>
-            <Link href="/dashboard">
+            <Link href="/customers">
               <ArrowLeft className="h-4 w-4" />
             </Link>
           </Button>
@@ -83,6 +85,8 @@ export default function CustomerProfilePage({ params }: { params: { customerId: 
             </CardContent>
           </Card>
           
+          {customer.membership && <MembershipCard membership={customer.membership} />}
+
           <LinkedIdentities identities={customer.identities} />
           
           {customer.eyeMeasurement && <EyeMeasurementCard measurement={customer.eyeMeasurement} />}
@@ -90,6 +94,7 @@ export default function CustomerProfilePage({ params }: { params: { customerId: 
 
         {/* Right Column */}
         <div className="md:col-span-2 space-y-6">
+          {customer.debt && <DebtHistoryCard debt={customer.debt} />}
           <TicketHistory tickets={customerTickets} />
           <InteractionTimeline interactions={customer.interactions} />
           <OrderHistory orders={customer.orders} />
