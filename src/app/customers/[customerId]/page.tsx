@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Edit, Tag } from "lucide-react";
+import { ArrowLeft, Edit, Tag, Trophy } from "lucide-react";
 import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
 import { LinkedIdentities } from "@/components/customers/linked-identities";
@@ -17,7 +17,6 @@ import { EyeMeasurementCard } from "@/components/customers/eye-measurement-card"
 import { InteractionTimeline } from "@/components/customers/interaction-timeline";
 import { Badge } from "@/components/ui/badge";
 import { TicketHistory } from "@/components/customers/ticket-history";
-import { MembershipCard } from "@/components/customers/membership-card";
 import { DebtHistoryCard } from "@/components/customers/debt-history-card";
 
 export default function CustomerProfilePage({ params }: { params: { customerId: string } }) {
@@ -28,6 +27,12 @@ export default function CustomerProfilePage({ params }: { params: { customerId: 
   }
 
   const customerTickets = getTicketsForCustomer(params.customerId);
+
+  const levelColors: { [key: string]: string } = {
+    Bronze: "text-[#cd7f32]",
+    Silver: "text-slate-400",
+    Gold: "text-yellow-500",
+  }
 
   return (
     <div className="flex-1 space-y-4 p-8 pt-6">
@@ -77,6 +82,18 @@ export default function CustomerProfilePage({ params }: { params: { customerId: 
                     <span className="text-muted-foreground">Member Since</span>
                     <span className="font-medium">{new Date(customer.createdAt).toLocaleDateString()}</span>
                 </div>
+                {customer.membership && (
+                    <>
+                        <Separator />
+                        <div className="flex justify-between">
+                            <span className="text-muted-foreground flex items-center gap-1.5">
+                                <Trophy className={`size-4 ${levelColors[customer.membership.level]}`} />
+                                Membership
+                            </span>
+                            <span className={`font-bold ${levelColors[customer.membership.level]}`}>{customer.membership.level}</span>
+                        </div>
+                    </>
+                )}
                 <Separator />
                 <div>
                     <span className="text-muted-foreground flex items-center gap-2 mb-2"><Tag className="size-4" /> Tags</span>
@@ -88,8 +105,6 @@ export default function CustomerProfilePage({ params }: { params: { customerId: 
                 </div>
                 </CardContent>
             </Card>
-
-            {customer.membership && <MembershipCard membership={customer.membership} />}
 
             <LinkedIdentities identities={customer.identities} />
             
