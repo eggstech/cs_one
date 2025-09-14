@@ -34,18 +34,22 @@ import { Label } from "@/components/ui/label";
 import { Interaction, Ticket } from "@/lib/types";
 
 export default function TicketDetailPage({ params }: { params: { ticketId: string } }) {
-  const [ticket, setTicket] = useState<Ticket | undefined>(getTicket(params.ticketId));
+  const [ticket, setTicket] = useState<Ticket | undefined>();
   const [newNote, setNewNote] = useState("");
 
   const customer = ticket ? getCustomer(ticket.customerId) : undefined;
   const agents = allAgents;
   
   useEffect(() => {
-    // In a real app, you might refetch the ticket data if it's updated.
-    // For this mock, we just ensure the component re-renders if the ticket object changes.
-  }, [ticket]);
+    const initialTicket = getTicket(params.ticketId);
+    if (initialTicket) {
+      setTicket(initialTicket);
+    }
+  }, [params.ticketId]);
   
-  if (!ticket) {
+  if (ticket === undefined && typeof window !== 'undefined') {
+    // Still loading on the client
+  } else if (!ticket) {
     notFound();
   }
 
@@ -61,7 +65,7 @@ export default function TicketDetailPage({ params }: { params: { ticketId: strin
   };
   
   const handleAddNote = () => {
-    if (newNote.trim() === "") return;
+    if (!ticket || newNote.trim() === "") return;
     
     const note: Interaction = {
         id: `int-${Date.now()}`,
@@ -77,6 +81,10 @@ export default function TicketDetailPage({ params }: { params: { ticketId: strin
     setNewNote("");
   };
 
+  if (!ticket) {
+    // You can return a loading state here if you want
+    return <div className="flex-1 space-y-4 p-8 pt-6">Loading...</div>;
+  }
 
   return (
     <div className="flex-1 space-y-4 p-8 pt-6">
