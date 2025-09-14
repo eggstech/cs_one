@@ -3,7 +3,6 @@ import { notFound } from "next/navigation";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -56,48 +55,49 @@ export default function CustomerProfilePage({ params }: { params: { customerId: 
         </Button>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-3">
-        {/* Left Column */}
-        <div className="md:col-span-1 space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Customer Details</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3 text-sm">
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Phone</span>
-                <span className="font-medium">{customer.phone}</span>
-              </div>
-              <Separator />
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Member Since</span>
-                <span className="font-medium">{new Date(customer.createdAt).toLocaleDateString()}</span>
-              </div>
-              <Separator />
-              <div>
-                <span className="text-muted-foreground flex items-center gap-2 mb-2"><Tag className="size-4" /> Tags</span>
-                <div className="flex flex-wrap gap-2">
-                    {customer.tags.map(tag => (
-                        <Badge key={tag} variant="secondary">{tag}</Badge>
-                    ))}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          
-          {customer.membership && <MembershipCard membership={customer.membership} />}
-
-          <LinkedIdentities identities={customer.identities} />
-          
-          {customer.eyeMeasurement && <EyeMeasurementCard measurement={customer.eyeMeasurement} />}
+      <div className="grid gap-6 lg:grid-cols-3">
+        {/* Center Column (Main) */}
+        <div className="lg:col-span-2 space-y-6">
+          <InteractionTimeline interactions={customer.interactions} />
         </div>
 
         {/* Right Column */}
-        <div className="md:col-span-2 space-y-6">
-          {customer.debt && <DebtHistoryCard debt={customer.debt} />}
-          <TicketHistory tickets={customerTickets} />
-          <InteractionTimeline interactions={customer.interactions} />
-          <OrderHistory orders={customer.orders} />
+        <div className="lg:col-span-1 space-y-6">
+            <Card>
+                <CardHeader>
+                <CardTitle>Customer Details</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3 text-sm">
+                <div className="flex justify-between">
+                    <span className="text-muted-foreground">Phone</span>
+                    <span className="font-medium">{customer.phone}</span>
+                </div>
+                <Separator />
+                <div className="flex justify-between">
+                    <span className="text-muted-foreground">Member Since</span>
+                    <span className="font-medium">{new Date(customer.createdAt).toLocaleDateString()}</span>
+                </div>
+                <Separator />
+                <div>
+                    <span className="text-muted-foreground flex items-center gap-2 mb-2"><Tag className="size-4" /> Tags</span>
+                    <div className="flex flex-wrap gap-2">
+                        {customer.tags.map(tag => (
+                            <Badge key={tag} variant="secondary">{tag}</Badge>
+                        ))}
+                    </div>
+                </div>
+                </CardContent>
+            </Card>
+
+            {customer.membership && <MembershipCard membership={customer.membership} />}
+
+            <LinkedIdentities identities={customer.identities} />
+            
+            {customer.eyeMeasurement && <EyeMeasurementCard measurement={customer.eyeMeasurement} />}
+
+            <TicketHistory tickets={customerTickets} />
+            <OrderHistory orders={customer.orders} />
+            {customer.debt && <DebtHistoryCard debt={customer.debt} />}
         </div>
       </div>
     </div>
