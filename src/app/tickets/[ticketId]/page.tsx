@@ -38,9 +38,6 @@ export default function TicketDetailPage({ params }: { params: { ticketId: strin
   const [ticket, setTicket] = useState<Ticket | undefined>(undefined);
   const [newNote, setNewNote] = useState("");
 
-  const customer = ticket ? getCustomer(ticket.customerId) : undefined;
-  const agents = allAgents;
-  
   useEffect(() => {
     const foundTicket = getTicket(ticketId);
     if (foundTicket) {
@@ -51,6 +48,9 @@ export default function TicketDetailPage({ params }: { params: { ticketId: strin
         notFound();
     }
   }, [ticketId]);
+  
+  const customer = ticket ? getCustomer(ticket.customerId) : undefined;
+  const agents = allAgents;
   
   if (!ticket) {
      // Render loading or a placeholder on the server and initial client render
