@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { getTicket, getCustomer, agents as allAgents } from "@/lib/data";
-import { notFound } from "next/navigation";
+import { notFound, useSearchParams } from "next/navigation";
 import {
   Card,
   CardContent,
@@ -34,24 +34,41 @@ import { Label } from "@/components/ui/label";
 import { Interaction, Ticket } from "@/lib/types";
 
 export default function TicketDetailPage({ params }: { params: { ticketId: string } }) {
-  const [ticket, setTicket] = useState<Ticket | undefined>();
+  const [ticket, setTicket] = useState<Ticket | undefined>(() => getTicket(params.ticketId));
   const [newNote, setNewNote] = useState("");
 
   const customer = ticket ? getCustomer(ticket.customerId) : undefined;
   const agents = allAgents;
   
   useEffect(() => {
-    const initialTicket = getTicket(params.ticketId);
-    if (initialTicket) {
-      setTicket(initialTicket);
+    if (!ticket) {
+        const initialTicket = getTicket(params.ticketId);
+        if (initialTicket) {
+            setTicket(initialTicket);
+        }
     }
-  }, [params.ticketId]);
+  }, [params.ticketId, ticket]);
   
-  if (ticket === undefined && typeof window !== 'undefined') {
-    // Still loading on the client
-  } else if (!ticket) {
-    notFound();
+  if (!ticket) {
+    if (typeof window !== 'undefined') {
+        // On the client and ticket not found after check
+        const initialTicket = getTicket(params.ticketId);
+        if(!initialTicket) {
+            notFound();
+        }
+        if(!ticket) {
+            setTicket(initialTicket);
+        }
+    } else {
+        // On the server, if ticket is not found initially
+        if (!getTicket(params.ticketId)) {
+            notFound();
+        }
+    }
+     // Render loading or a placeholder on the server if needed, before client-side hydration
+    return <div className="flex-1 space-y-4 p-8 pt-6">Loading...</div>;
   }
+
 
   const handleStatusChange = (status: Ticket['status']) => {
     setTicket(prevTicket => prevTicket ? { ...prevTicket, status, updatedAt: new Date().toISOString() } : undefined);
@@ -80,11 +97,6 @@ export default function TicketDetailPage({ params }: { params: { ticketId: strin
     setTicket(prevTicket => prevTicket ? { ...prevTicket, interactions: [note, ...prevTicket.interactions], updatedAt: new Date().toISOString() } : undefined);
     setNewNote("");
   };
-
-  if (!ticket) {
-    // You can return a loading state here if you want
-    return <div className="flex-1 space-y-4 p-8 pt-6">Loading...</div>;
-  }
 
   return (
     <div className="flex-1 space-y-4 p-8 pt-6">
