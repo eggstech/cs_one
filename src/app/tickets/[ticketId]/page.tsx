@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { getTicket, getCustomer, agents as allAgents } from "@/lib/data";
-import { notFound, useSearchParams } from "next/navigation";
+import { notFound } from "next/navigation";
 import {
   Card,
   CardContent,
@@ -34,39 +34,27 @@ import { Label } from "@/components/ui/label";
 import { Interaction, Ticket } from "@/lib/types";
 
 export default function TicketDetailPage({ params }: { params: { ticketId: string } }) {
-  const [ticket, setTicket] = useState<Ticket | undefined>(() => getTicket(params.ticketId));
+  const [ticket, setTicket] = useState<Ticket | undefined>(undefined);
   const [newNote, setNewNote] = useState("");
 
   const customer = ticket ? getCustomer(ticket.customerId) : undefined;
   const agents = allAgents;
   
   useEffect(() => {
-    if (!ticket) {
-        const initialTicket = getTicket(params.ticketId);
-        if (initialTicket) {
-            setTicket(initialTicket);
-        }
+    const foundTicket = getTicket(params.ticketId);
+    if (foundTicket) {
+        setTicket(foundTicket);
+    } else {
+        // To handle cases where the ticket might not be found.
+        // In a real app, you might show a "not found" message.
+        // For now, notFound() will trigger a 404 page.
+        notFound();
     }
-  }, [params.ticketId, ticket]);
+  }, [params.ticketId]);
   
   if (!ticket) {
-    if (typeof window !== 'undefined') {
-        // On the client and ticket not found after check
-        const initialTicket = getTicket(params.ticketId);
-        if(!initialTicket) {
-            notFound();
-        }
-        if(!ticket) {
-            setTicket(initialTicket);
-        }
-    } else {
-        // On the server, if ticket is not found initially
-        if (!getTicket(params.ticketId)) {
-            notFound();
-        }
-    }
-     // Render loading or a placeholder on the server if needed, before client-side hydration
-    return <div className="flex-1 space-y-4 p-8 pt-6">Loading...</div>;
+     // Render loading or a placeholder on the server and initial client render
+    return <div className="flex-1 space-y-4 p-8 pt-6">Loading ticket details...</div>;
   }
 
 
