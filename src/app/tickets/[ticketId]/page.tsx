@@ -34,6 +34,7 @@ import { Label } from "@/components/ui/label";
 import { Interaction, Ticket } from "@/lib/types";
 
 export default function TicketDetailPage({ params }: { params: { ticketId: string } }) {
+  const { ticketId } = params;
   const [ticket, setTicket] = useState<Ticket | undefined>(undefined);
   const [newNote, setNewNote] = useState("");
 
@@ -41,16 +42,15 @@ export default function TicketDetailPage({ params }: { params: { ticketId: strin
   const agents = allAgents;
   
   useEffect(() => {
-    const foundTicket = getTicket(params.ticketId);
+    const foundTicket = getTicket(ticketId);
     if (foundTicket) {
         setTicket(foundTicket);
     } else {
-        // To handle cases where the ticket might not be found.
         // In a real app, you might show a "not found" message.
         // For now, notFound() will trigger a 404 page.
         notFound();
     }
-  }, [params.ticketId]);
+  }, [ticketId]);
   
   if (!ticket) {
      // Render loading or a placeholder on the server and initial client render
