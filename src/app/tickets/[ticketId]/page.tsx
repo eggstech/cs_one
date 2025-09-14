@@ -1,4 +1,7 @@
-import { getTicket, getCustomer } from "@/lib/data";
+'use client';
+
+import { useState, useEffect } from "react";
+import { getTicket, getCustomer, agents as allAgents } from "@/lib/data";
 import { notFound } from "next/navigation";
 import {
   Card,
@@ -16,12 +19,6 @@ import { Separator } from "@/components/ui/separator";
 import { format } from "date-fns";
 import {
   ArrowLeft,
-  Tag,
-  Clock,
-  User,
-  MessageSquare,
-  Phone,
-  StickyNote,
   Send,
 } from "lucide-react";
 import Link from "next/link";
@@ -33,16 +30,53 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { agents } from "@/lib/data";
 import { Label } from "@/components/ui/label";
-
+import { Interaction, Ticket } from "@/lib/types";
 
 export default function TicketDetailPage({ params }: { params: { ticketId: string } }) {
-  const ticket = getTicket(params.ticketId);
+  const [ticket, setTicket] = useState<Ticket | undefined>(getTicket(params.ticketId));
+  const [newNote, setNewNote] = useState("");
+
+  const customer = ticket ? getCustomer(ticket.customerId) : undefined;
+  const agents = allAgents;
+  
+  useEffect(() => {
+    // In a real app, you might refetch the ticket data if it's updated.
+    // For this mock, we just ensure the component re-renders if the ticket object changes.
+  }, [ticket]);
+  
   if (!ticket) {
     notFound();
   }
-  const customer = getCustomer(ticket.customerId);
+
+  const handleStatusChange = (status: Ticket['status']) => {
+    setTicket(prevTicket => prevTicket ? { ...prevTicket, status, updatedAt: new Date().toISOString() } : undefined);
+  };
+  
+  const handleAgentChange = (agentId: string) => {
+    const newAgent = agents.find(a => a.id === agentId);
+    if (newAgent) {
+      setTicket(prevTicket => prevTicket ? { ...prevTicket, agent: newAgent, updatedAt: new Date().toISOString() } : undefined);
+    }
+  };
+  
+  const handleAddNote = () => {
+    if (newNote.trim() === "") return;
+    
+    const note: Interaction = {
+        id: `int-${Date.now()}`,
+        type: 'Note',
+        channel: 'System',
+        date: new Date().toISOString(),
+        agent: agents[0], // Assuming the current user is agent-1
+        content: newNote,
+        ticketId: ticket.id,
+    };
+    
+    setTicket(prevTicket => prevTicket ? { ...prevTicket, interactions: [note, ...prevTicket.interactions], updatedAt: new Date().toISOString() } : undefined);
+    setNewNote("");
+  };
+
 
   return (
     <div className="flex-1 space-y-4 p-8 pt-6">
@@ -78,8 +112,14 @@ export default function TicketDetailPage({ params }: { params: { ticketId: strin
             <CardFooter className="flex flex-col items-start gap-2 border-t pt-6">
                 <Label htmlFor="new-note" className="text-sm font-medium">Add a new note or reply</Label>
                 <div className="w-full relative">
-                    <Textarea id="new-note" placeholder="Type your message here..." className="pr-12"/>
-                    <Button variant="ghost" size="icon" className="absolute right-2 top-1/2 -translate-y-1/2">
+                    <Textarea 
+                      id="new-note" 
+                      placeholder="Type your message here..." 
+                      className="pr-12"
+                      value={newNote}
+                      onChange={(e) => setNewNote(e.target.value)}
+                    />
+                    <Button variant="ghost" size="icon" className="absolute right-2 top-1/2 -translate-y-1/2" onClick={handleAddNote}>
                         <Send className="h-5 w-5 text-primary" />
                     </Button>
                 </div>
@@ -94,7 +134,7 @@ export default function TicketDetailPage({ params }: { params: { ticketId: strin
             <CardContent className="space-y-4 text-sm">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Status</span>
-                <Select defaultValue={ticket.status}>
+                <Select value={ticket.status} onValueChange={handleStatusChange}>
                   <SelectTrigger className="w-[180px] h-8">
                     <SelectValue placeholder="Status" />
                   </SelectTrigger>
@@ -109,7 +149,7 @@ export default function TicketDetailPage({ params }: { params: { ticketId: strin
               <Separator />
               <div className="flex justify-between items-center">
                 <span className="text-muted-foreground">Agent</span>
-                 <Select defaultValue={ticket.agent.id}>
+                 <Select value={ticket.agent.id} onValueChange={handleAgentChange}>
                   <SelectTrigger className="w-[180px] h-8">
                     <SelectValue placeholder="Agent" />
                   </SelectTrigger>

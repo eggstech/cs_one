@@ -1,9 +1,9 @@
+'use client';
+
+import { useState } from 'react';
 import {
   Card,
   CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
 } from '@/components/ui/card';
 import {
   Table,
@@ -16,7 +16,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { tickets } from '@/lib/data';
+import { tickets as allTickets, agents } from '@/lib/data';
 import { PlusCircle, Filter } from 'lucide-react';
 import Link from 'next/link';
 import { format } from 'date-fns';
@@ -28,8 +28,23 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Ticket } from '@/lib/types';
+
+const ticketStatuses: Ticket['status'][] = ['New', 'In-Progress', 'Resolved', 'Closed'];
 
 export default function TicketsPage() {
+  const [tickets, setTickets] = useState<Ticket[]>(allTickets);
+  const [statusFilters, setStatusFilters] = useState<Ticket['status'][]>(['New', 'In-Progress']);
+
+  const handleFilterChange = (status: Ticket['status'], checked: boolean) => {
+    setStatusFilters(prev => {
+      const newFilters = checked ? [...prev, status] : prev.filter(s => s !== status);
+      const filteredTickets = allTickets.filter(ticket => newFilters.includes(ticket.status));
+      setTickets(filteredTickets);
+      return newFilters;
+    });
+  };
+
   return (
     <div className="flex-1 space-y-4 p-8 pt-6">
       <div className="flex items-center justify-between">
@@ -50,15 +65,22 @@ export default function TicketsPage() {
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Filter by Status</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuCheckboxItem checked>New</DropdownMenuCheckboxItem>
-              <DropdownMenuCheckboxItem checked>In-Progress</DropdownMenuCheckboxItem>
-              <DropdownMenuCheckboxItem>Resolved</DropdownMenuCheckboxItem>
-              <DropdownMenuCheckboxItem>Closed</DropdownMenuCheckboxItem>
+              {ticketStatuses.map(status => (
+                <DropdownMenuCheckboxItem
+                  key={status}
+                  checked={statusFilters.includes(status)}
+                  onCheckedChange={(checked) => handleFilterChange(status, !!checked)}
+                >
+                  {status}
+                </DropdownMenuCheckboxItem>
+              ))}
             </DropdownMenuContent>
           </DropdownMenu>
-          <Button>
-            <PlusCircle className="mr-2 h-4 w-4" />
-            New Ticket
+          <Button asChild>
+            <Link href="/tickets/new">
+              <PlusCircle className="mr-2 h-4 w-4" />
+              New Ticket
+            </Link>
           </Button>
         </div>
       </div>
