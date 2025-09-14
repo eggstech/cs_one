@@ -33,7 +33,7 @@ const interactions: Interaction[] = [
     channel: 'Facebook',
     date: '2024-07-23T10:00:00Z',
     agent: agents[1],
-    content: 'Followed up via Facebook chat to provide tracking number.'
+    content: 'Followed up via Facebook chat to provide tracking number. Customer seemed happy.'
   },
   {
     id: 'int-4',
@@ -41,7 +41,52 @@ const interactions: Interaction[] = [
     channel: 'System',
     date: '2024-07-23T10:05:00Z',
     agent: agents[1],
-    content: 'Customer confirmed receipt of tracking number. Happy with the quick response.'
+    content: 'Customer confirmed receipt of tracking number. Marked ticket as resolved.'
+  },
+  {
+    id: 'int-5',
+    type: 'Ticket',
+    channel: 'System',
+    date: '2024-07-21T16:00:00Z',
+    agent: agents[2],
+    ticketId: 'TKT-002',
+    content: 'Ticket TKT-002 created: "Issue with new prescription".'
+  },
+  {
+    id: 'int-6',
+    type: 'Note',
+    channel: 'System',
+    date: '2024-06-15T11:00:00Z',
+    agent: agents[0],
+    content: 'Customer called to update their prescription details. Updated Eye Measurement profile.'
+  },
+  {
+    id: 'int-7',
+    type: 'Chat',
+    channel: 'Zalo',
+    date: '2024-05-30T17:20:00Z',
+    agent: agents[2],
+    content: 'Customer asked about our return policy. Sent them a link to the FAQ page.'
+  },
+  {
+    id: 'int-8',
+    type: 'Call',
+    channel: 'Phone',
+    date: '2024-07-24T11:00:00Z',
+    duration: '12m 15s',
+    agent: agents[0],
+    recordingUrl: '#',
+    ticketId: 'TKT-003',
+    content: 'Customer called to request a return for order ORD-001. Claims the frames are not as expected.'
+  },
+  {
+    id: 'int-9',
+    type: 'Note',
+    channel: 'System',
+    date: '2024-07-24T11:15:00Z',
+    agent: agents[0],
+    ticketId: 'TKT-003',
+    content: 'Advised customer on the return process. Awaiting customer to ship the item back.'
   }
 ];
 
@@ -58,7 +103,7 @@ export const customers: Customer[] = [
       { channel: 'Email', identifier: 'john.doe@example.com' },
       { channel: 'Facebook', identifier: 'johndoe' },
     ],
-    interactions: interactions,
+    interactions: [interactions[0], interactions[1], interactions[2], interactions[3], interactions[7], interactions[8]].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
     orders: [
       {
         id: 'ORD-001',
@@ -66,6 +111,13 @@ export const customers: Customer[] = [
         status: 'Shipped',
         total: 125.50,
         items: [{ id: 'item-a', name: 'Stylish Frames', quantity: 1, price: 125.50 }]
+      },
+      {
+        id: 'ORD-000',
+        date: '2024-01-20T11:00:00Z',
+        status: 'Delivered',
+        total: 99.00,
+        items: [{ id: 'item-c', name: 'Reading Glasses', quantity: 1, price: 99.00 }]
       },
     ],
     eyeMeasurement: {
@@ -98,17 +150,7 @@ export const customers: Customer[] = [
       { channel: 'Phone', identifier: '555-0102' },
       { channel: 'Zalo', identifier: 'janesmith.zalo' },
     ],
-    interactions: [
-      {
-        id: 'int-5',
-        type: 'Ticket',
-        channel: 'System',
-        date: '2024-07-21T16:00:00Z',
-        agent: agents[2],
-        ticketId: 'TKT-002',
-        content: 'Ticket TKT-002 created: "Issue with new prescription".'
-      }
-    ],
+    interactions: [interactions[4], interactions[5], interactions[6]].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
     orders: [
        {
         id: 'ORD-002',
@@ -156,7 +198,7 @@ export const tickets: Ticket[] = [
     agent: agents[1],
     createdAt: '2024-07-22T14:35:00Z',
     updatedAt: '2024-07-23T10:05:00Z',
-    interactions: interactions.filter(i => i.ticketId === 'TKT-001' || i.id === 'int-1' || i.id === 'int-3' || i.id === 'int-4'),
+    interactions: interactions.filter(i => i.ticketId === 'TKT-001' || i.id === 'int-1' || i.id === 'int-3' || i.id === 'int-4').sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
   },
   {
     id: 'TKT-002',
@@ -179,8 +221,8 @@ export const tickets: Ticket[] = [
     status: 'New',
     agent: agents[0],
     createdAt: '2024-07-24T09:00:00Z',
-    updatedAt: '2024-07-24T09:00:00Z',
-    interactions: [],
+    updatedAt: '2024-07-24T11:15:00Z',
+    interactions: interactions.filter(i => i.ticketId === 'TKT-003').sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
   }
 ];
 
