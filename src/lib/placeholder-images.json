@@ -1,3 +1,40 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "avatar-1",
+      "description": "Avatar for John Doe",
+      "imageUrl": "https://picsum.photos/seed/1/100/100",
+      "imageHint": "male portrait"
+    },
+    {
+      "id": "avatar-2",
+      "description": "Avatar for Jane Smith",
+      "imageUrl": "https://picsum.photos/seed/2/100/100",
+      "imageHint": "female portrait"
+    },
+    {
+      "id": "avatar-99",
+      "description": "Avatar for unrecognized caller",
+      "imageUrl": "https://picsum.photos/seed/99/100/100",
+      "imageHint": "abstract person"
+    },
+    {
+      "id": "agent-1",
+      "description": "Avatar for agent Alex Green",
+      "imageUrl": "https://picsum.photos/seed/101/40/40",
+      "imageHint": "professional person"
+    },
+    {
+      "id": "agent-2",
+      "description": "Avatar for agent Brianna White",
+      "imageUrl": "https://picsum.photos/seed/102/40/40",
+      "imageHint": "professional woman"
+    },
+    {
+      "id": "agent-3",
+      "description": "Avatar for agent Charlie Brown",
+      "imageUrl": "https://picsum.photos/seed/103/40/40",
+      "imageHint": "person smiling"
+    }
+  ]
 }
