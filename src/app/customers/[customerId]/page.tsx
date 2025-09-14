@@ -1,4 +1,4 @@
-import { getCustomer } from "@/lib/data";
+import { getCustomer, getTicketsForCustomer } from "@/lib/data";
 import { notFound } from "next/navigation";
 import {
   Card,
@@ -17,6 +17,7 @@ import { OrderHistory } from "@/components/customers/order-history";
 import { EyeMeasurementCard } from "@/components/customers/eye-measurement-card";
 import { InteractionTimeline } from "@/components/customers/interaction-timeline";
 import { Badge } from "@/components/ui/badge";
+import { TicketHistory } from "@/components/customers/ticket-history";
 
 export default function CustomerProfilePage({ params }: { params: { customerId: string } }) {
   const customer = getCustomer(params.customerId);
@@ -24,6 +25,8 @@ export default function CustomerProfilePage({ params }: { params: { customerId: 
   if (!customer) {
     notFound();
   }
+
+  const customerTickets = getTicketsForCustomer(params.customerId);
 
   return (
     <div className="flex-1 space-y-4 p-8 pt-6">
@@ -87,6 +90,7 @@ export default function CustomerProfilePage({ params }: { params: { customerId: 
 
         {/* Right Column */}
         <div className="md:col-span-2 space-y-6">
+          <TicketHistory tickets={customerTickets} />
           <InteractionTimeline interactions={customer.interactions} />
           <OrderHistory orders={customer.orders} />
         </div>

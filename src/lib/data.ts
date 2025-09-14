@@ -165,3 +165,4 @@ export const tickets: Ticket[] = [
 
 export const getCustomer = (id: string) => customers.find(c => c.id === id);
 export const getTicket = (id: string) => tickets.find(t => t.id === id);
+export const getTicketsForCustomer = (customerId: string) => tickets.filter(t => t.customerId === customerId);
