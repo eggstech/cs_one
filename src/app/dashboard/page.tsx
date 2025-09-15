@@ -8,9 +8,11 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import {
+  PhoneIncoming,
   Ticket,
+  Users,
 } from 'lucide-react';
-import { tickets } from '@/lib/data';
+import { customers, tickets } from '@/lib/data';
 import {
   Table,
   TableBody,
@@ -22,8 +24,8 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 import { ScreenPop } from '@/components/screen-pop';
-import { customers } from '@/lib/data';
 import { formatDistanceToNow } from 'date-fns';
 
 export default function DashboardPage() {
@@ -37,6 +39,12 @@ export default function DashboardPage() {
     <div className="flex-1 space-y-4 p-8 pt-6">
       <div className="flex items-center justify-between space-y-2">
         <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+        <div className="flex items-center space-x-2">
+          <Button onClick={handleSimulateCall}>
+            <PhoneIncoming className="mr-2 h-4 w-4" />
+            Simulate Incoming Call
+          </Button>
+        </div>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -70,72 +78,74 @@ export default function DashboardPage() {
         </Card>
       </div>
 
-      <div>
-        <Card>
-          <CardHeader>
-            <CardTitle>Recent Tickets</CardTitle>
-            <CardDescription>
-              A list of the most recently updated tickets.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Customer</TableHead>
-                  <TableHead>Subject</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Last Update</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {tickets.slice(0, 5).map((ticket) => (
-                  <TableRow key={ticket.id} className="cursor-pointer">
-                    <TableCell>
-                      <Link href={`/customers/${ticket.customerId}`}>
-                        <div className="flex items-center gap-3">
-                          <Avatar className="h-8 w-8">
-                            <AvatarImage
-                              src={ticket.customerAvatarUrl}
-                              alt={ticket.customerName}
-                            />
-                            <AvatarFallback>
-                              {ticket.customerName.charAt(0)}
-                            </AvatarFallback>
-                          </Avatar>
-                          <span className="font-medium hover:underline">
-                            {ticket.customerName}
-                          </span>
-                        </div>
-                      </Link>
-                    </TableCell>
-                    <TableCell>
-                      <Link href={`/tickets/${ticket.id}`} className="hover:underline">
-                        {ticket.subject}
-                      </Link>
-                    </TableCell>
-                    <TableCell>
-                      <Badge
-                        variant={
-                          ticket.status === 'Resolved' || ticket.status === 'Closed'
-                            ? 'secondary'
-                            : ticket.status === 'New'
-                            ? 'default'
-                            : 'outline'
-                        }
-                      >
-                        {ticket.status}
-                      </Badge>
-                    </TableCell>
-                     <TableCell>
-                      {formatDistanceToNow(new Date(ticket.updatedAt), { addSuffix: true })}
-                    </TableCell>
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+        <div className="col-span-full">
+          <Card>
+            <CardHeader>
+              <CardTitle>Recent Tickets</CardTitle>
+              <CardDescription>
+                A list of the most recently updated tickets.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Customer</TableHead>
+                    <TableHead>Subject</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Last Update</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
+                </TableHeader>
+                <TableBody>
+                  {tickets.slice(0, 5).map((ticket) => (
+                    <TableRow key={ticket.id} className="cursor-pointer">
+                      <TableCell>
+                        <Link href={`/customers/${ticket.customerId}`}>
+                          <div className="flex items-center gap-3">
+                            <Avatar className="h-8 w-8">
+                              <AvatarImage
+                                src={ticket.customerAvatarUrl}
+                                alt={ticket.customerName}
+                              />
+                              <AvatarFallback>
+                                {ticket.customerName.charAt(0)}
+                              </AvatarFallback>
+                            </Avatar>
+                            <span className="font-medium hover:underline">
+                              {ticket.customerName}
+                            </span>
+                          </div>
+                        </Link>
+                      </TableCell>
+                      <TableCell>
+                        <Link href={`/tickets/${ticket.id}`} className="hover:underline">
+                          {ticket.subject}
+                        </Link>
+                      </TableCell>
+                      <TableCell>
+                        <Badge
+                          variant={
+                            ticket.status === 'Resolved' || ticket.status === 'Closed'
+                              ? 'secondary'
+                              : ticket.status === 'New'
+                              ? 'default'
+                              : 'outline'
+                          }
+                        >
+                          {ticket.status}
+                        </Badge>
+                      </TableCell>
+                       <TableCell>
+                        {formatDistanceToNow(new Date(ticket.updatedAt), { addSuffix: true })}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </div>
       </div>
       <ScreenPop
         customer={customers[2]}
