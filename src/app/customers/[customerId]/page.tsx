@@ -39,7 +39,7 @@ export default function CustomerProfilePage({ params }: { params: { customerId: 
     setHydrated(true);
   }, [customerId]);
 
-  if (!customer) {
+  if (!hydrated) {
     // Show a loading state or a skeleton screen while the customer is being fetched.
     return (
       <div className="flex-1 space-y-4 p-8 pt-6">
@@ -55,6 +55,10 @@ export default function CustomerProfilePage({ params }: { params: { customerId: 
         </div>
       </div>
     );
+  }
+
+  if (!customer) {
+    notFound();
   }
   
   const handleAddInteraction = (interactionData: Omit<Interaction, 'id' | 'date' | 'agent'>) => {
@@ -94,23 +98,6 @@ export default function CustomerProfilePage({ params }: { params: { customerId: 
   }
 
   const callLink = `/tickets/new?customerId=${customer.id}&subject=${encodeURIComponent(`Phone Call with ${customer.name}`)}`;
-
-  if (!hydrated) {
-    return (
-      <div className="flex-1 space-y-4 p-8 pt-6">
-        <div className="h-16 w-full animate-pulse rounded-lg bg-muted"></div>
-        <div className="grid gap-6 lg:grid-cols-3">
-            <div className="lg:col-span-1 space-y-6">
-                <div className="h-64 w-full animate-pulse rounded-lg bg-muted"></div>
-                <div className="h-48 w-full animate-pulse rounded-lg bg-muted"></div>
-            </div>
-             <div className="lg:col-span-2">
-                <div className="h-96 w-full animate-pulse rounded-lg bg-muted"></div>
-            </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <>
