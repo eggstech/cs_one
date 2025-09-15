@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 import { getTicket, getCustomer, agents as allAgents } from "@/lib/data";
 import { notFound, useSearchParams } from "next/navigation";
 import {
@@ -37,16 +37,18 @@ import { Label } from "@/components/ui/label";
 import { Interaction, Ticket } from "@/lib/types";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
+import { useToast } from "@/hooks/use-toast";
 
 export default function TicketDetailPage({ params }: { params: { ticketId: string } }) {
-  const { ticketId } = params;
+  const { toast } = useToast();
   const searchParams = useSearchParams();
   const isCallActive = searchParams.get('call') === 'true';
 
   const [ticket, setTicket] = useState<Ticket | undefined>(undefined);
-  const [newNote, setNewNote] = useState("");
+  const [newInteractionContent, setNewInteractionContent] = useState("");
   const [replyType, setReplyType] = useState<'Note' | 'Email' | 'Chat'>('Note');
-  
+  const { ticketId } = params;
+
   useEffect(() => {
     const foundTicket = getTicket(ticketId);
     if (foundTicket) {
@@ -89,20 +91,31 @@ export default function TicketDetailPage({ params }: { params: { ticketId: strin
   };
   
   const handleAddReply = () => {
-    if (!ticket || newNote.trim() === "") return;
+    if (!ticket || newInteractionContent.trim() === "") {
+        toast({
+            variant: "destructive",
+            title: "Cannot add empty reply",
+            description: "Please enter some content before sending.",
+        })
+        return;
+    }
     
     const newInteraction: Interaction = {
         id: `int-${Date.now()}`,
         type: replyType,
-        channel: replyType === 'Note' ? 'System' : 'Email', // Simplified for now
+        channel: replyType === 'Note' ? 'System' : replyType === 'Email' ? 'Email' : 'Chat', // Simplified for now
         date: new Date().toISOString(),
         agent: agents[0], // Assuming the current user is agent-1
-        content: newNote,
+        content: newInteractionContent,
         ticketId: ticket.id,
     };
     
     setTicket(prevTicket => prevTicket ? { ...prevTicket, interactions: [newInteraction, ...prevTicket.interactions], updatedAt: new Date().toISOString() } : undefined);
-    setNewNote("");
+    setNewInteractionContent("");
+    toast({
+        title: `${replyType} added`,
+        description: `Your ${replyType.toLowerCase()} has been added to the timeline.`,
+    })
   };
 
   const onCallEnd = (callInteraction: Interaction) => {
@@ -158,8 +171,8 @@ export default function TicketDetailPage({ params }: { params: { ticketId: strin
                             <Textarea 
                               id="new-note" 
                               placeholder="Add an internal note for your team..." 
-                              value={newNote}
-                              onChange={(e) => setNewNote(e.target.value)}
+                              value={newInteractionContent}
+                              onChange={(e) => setNewInteractionContent(e.target.value)}
                               className="min-h-24"
                             />
                         </div>
@@ -169,8 +182,8 @@ export default function TicketDetailPage({ params }: { params: { ticketId: strin
                             <Input defaultValue={`Re: ${ticket.subject}`} placeholder="Subject"/>
                             <Textarea 
                               placeholder="Compose your email reply..." 
-                              value={newNote}
-                              onChange={(e) => setNewNote(e.target.value)}
+                              value={newInteractionContent}
+                              onChange={(e) => setNewInteractionContent(e.target.value)}
                               className="min-h-40"
                             />
                         </div>
@@ -179,8 +192,8 @@ export default function TicketDetailPage({ params }: { params: { ticketId: strin
                         <div className="space-y-4">
                            <Textarea 
                               placeholder="Type your chat message..." 
-                              value={newNote}
-                              onChange={(e) => setNewNote(e.target.value)}
+                              value={newInteractionContent}
+                              onChange={(e) => setNewInteractionContent(e.target.value)}
                               className="min-h-24"
                             />
                         </div>
@@ -189,7 +202,7 @@ export default function TicketDetailPage({ params }: { params: { ticketId: strin
                 <div className="w-full flex justify-end mt-4">
                     <Button onClick={handleAddReply}>
                         <Send className="mr-2 h-4 w-4" />
-                        Send
+                        Send {replyType}
                     </Button>
                 </div>
             </CardFooter>
