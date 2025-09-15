@@ -87,6 +87,62 @@ const interactions: Interaction[] = [
     agent: agents[0],
     ticketId: 'TKT-003',
     content: 'Advised customer on the return process. Awaiting customer to ship the item back.'
+  },
+  {
+    id: 'int-10',
+    type: 'Ticket',
+    channel: 'System',
+    date: '2024-07-25T09:00:00Z',
+    agent: agents[1],
+    ticketId: 'TKT-004',
+    content: 'Ticket TKT-004 created: "Question about lens coating".'
+  },
+  {
+    id: 'int-11',
+    type: 'Call',
+    channel: 'Phone',
+    date: '2024-07-25T10:00:00Z',
+    duration: '8m 45s',
+    agent: agents[2],
+    recordingUrl: '#',
+    ticketId: 'TKT-005',
+    content: 'Customer called about a cracked lens on a recent order.'
+  },
+  {
+    id: 'int-12',
+    type: 'Note',
+    channel: 'System',
+    date: '2024-07-25T10:08:00Z',
+    agent: agents[2],
+    ticketId: 'TKT-005',
+    content: 'Ticket TKT-005 created: "Cracked lens on delivery". Advised customer we will ship a replacement.'
+  },
+  {
+    id: 'int-13',
+    type: 'Ticket',
+    channel: 'System',
+    date: '2024-07-20T10:00:00Z',
+    agent: agents[0],
+    ticketId: 'TKT-006',
+    content: 'Ticket TKT-006 created: "Billing inquiry".'
+  },
+  {
+    id: 'int-14',
+    type: 'Note',
+    channel: 'System',
+    date: '2024-07-20T10:15:00Z',
+    agent: agents[0],
+    ticketId: 'TKT-006',
+    content: 'Clarified the billing statement with the customer. Issue resolved.'
+  },
+  {
+    id: 'int-15',
+    type: 'Note',
+    channel: 'System',
+    date: '2024-07-21T11:00:00Z',
+    agent: agents[0],
+    ticketId: 'TKT-006',
+    content: 'Ticket auto-closed after 24 hours of resolution.'
   }
 ];
 
@@ -103,7 +159,7 @@ export const customers: Customer[] = [
       { channel: 'Email', identifier: 'john.doe@example.com' },
       { channel: 'Facebook', identifier: 'johndoe' },
     ],
-    interactions: [interactions[0], interactions[1], interactions[2], interactions[3], interactions[7], interactions[8]].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
+    interactions: [interactions[0], interactions[1], interactions[2], interactions[3], interactions[7], interactions[8], interactions[10], interactions[11], interactions[12], interactions[13], interactions[14]].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
     orders: [
       {
         id: 'ORD-001',
@@ -150,7 +206,7 @@ export const customers: Customer[] = [
       { channel: 'Phone', identifier: '555-0102' },
       { channel: 'Zalo', identifier: 'janesmith.zalo' },
     ],
-    interactions: [interactions[4], interactions[5], interactions[6]].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
+    interactions: [interactions[4], interactions[5], interactions[6], interactions[9]].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
     orders: [
        {
         id: 'ORD-002',
@@ -223,8 +279,44 @@ export const tickets: Ticket[] = [
     createdAt: '2024-07-24T09:00:00Z',
     updatedAt: '2024-07-24T11:15:00Z',
     interactions: interactions.filter(i => i.ticketId === 'TKT-003').sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
+  },
+  {
+    id: 'TKT-004',
+    customerId: 'cus-2',
+    customerName: 'Jane Smith',
+    customerAvatarUrl: 'https://picsum.photos/seed/2/40/40',
+    subject: 'Question about lens coating',
+    status: 'New',
+    agent: agents[1],
+    createdAt: '2024-07-25T09:00:00Z',
+    updatedAt: '2024-07-25T09:00:00Z',
+    interactions: interactions.filter(i => i.ticketId === 'TKT-004').sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
+  },
+  {
+    id: 'TKT-005',
+    customerId: 'cus-1',
+    customerName: 'John Doe',
+    customerAvatarUrl: 'https://picsum.photos/seed/1/40/40',
+    subject: 'Cracked lens on delivery',
+    status: 'In-Progress',
+    agent: agents[2],
+    createdAt: '2024-07-25T10:08:00Z',
+    updatedAt: '2024-07-25T10:08:00Z',
+    interactions: interactions.filter(i => i.ticketId === 'TKT-005').sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
+  },
+  {
+    id: 'TKT-006',
+    customerId: 'cus-1',
+    customerName: 'John Doe',
+    customerAvatarUrl: 'https://picsum.photos/seed/1/40/40',
+    subject: 'Billing inquiry',
+    status: 'Closed',
+    agent: agents[0],
+    createdAt: '2024-07-20T10:00:00Z',
+    updatedAt: '2024-07-21T11:00:00Z',
+    interactions: interactions.filter(i => i.ticketId === 'TKT-006').sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
   }
-];
+].sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
 
 export const getCustomer = (id: string) => customers.find(c => c.id === id);
 export const getTicket = (id: string) => tickets.find(t => t.id === id);
