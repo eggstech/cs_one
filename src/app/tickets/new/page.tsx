@@ -26,7 +26,7 @@ import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 import { Combobox } from '@/components/ui/combobox';
 
-const ticketCategories = ['Order', 'Staffs', 'Policy', 'Product', 'Other'];
+const ticketCategories = ['Order', 'Product', 'Staffs', 'Policy', 'Other'];
 
 export default function NewTicketPage() {
   const router = useRouter();
@@ -36,6 +36,7 @@ export default function NewTicketPage() {
   const [subject, setSubject] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('');
+  const [categorySpecificData, setCategorySpecificData] = useState<{[key: string]: string}>({});
 
   const customerOptions = customers
     .filter(c => c.name !== 'Unrecognized Caller')
@@ -43,6 +44,16 @@ export default function NewTicketPage() {
       value: customer.id,
       label: `${customer.name} - ${customer.phone}`
     }));
+
+  const handleCategoryChange = (newCategory: string) => {
+    setCategory(newCategory);
+    setCategorySpecificData({}); // Reset specific data when category changes
+  };
+
+  const handleSpecificDataChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setCategorySpecificData(prev => ({ ...prev, [name]: value }));
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,6 +73,7 @@ export default function NewTicketPage() {
       subject,
       description,
       category,
+      ...categorySpecificData,
     });
     
     toast({
@@ -71,6 +83,40 @@ export default function NewTicketPage() {
 
     router.push('/tickets');
   };
+
+  const renderCategorySpecificFields = () => {
+    switch (category) {
+      case 'Order':
+        return (
+          <div className="space-y-2">
+            <Label htmlFor="orderId">Order ID *</Label>
+            <Input 
+              id="orderId" 
+              name="orderId"
+              placeholder="e.g., ORD-001" 
+              value={categorySpecificData.orderId || ''}
+              onChange={handleSpecificDataChange}
+            />
+          </div>
+        );
+      case 'Product':
+        return (
+          <div className="space-y-2">
+            <Label htmlFor="productSku">Product Name/SKU</Label>
+            <Input 
+              id="productSku" 
+              name="productSku"
+              placeholder="e.g., Stylish Frames"
+              value={categorySpecificData.productSku || ''}
+              onChange={handleSpecificDataChange}
+            />
+          </div>
+        );
+      default:
+        return null;
+    }
+  };
+
 
   return (
     <div className="flex-1 space-y-4 p-8 pt-6">
@@ -136,7 +182,7 @@ export default function NewTicketPage() {
                 </div>
                  <div className="space-y-2">
                     <Label htmlFor="category">Category *</Label>
-                    <Select value={category} onValueChange={setCategory}>
+                    <Select value={category} onValueChange={handleCategoryChange}>
                         <SelectTrigger id="category">
                             <SelectValue placeholder="Select a category" />
                         </SelectTrigger>
@@ -150,6 +196,11 @@ export default function NewTicketPage() {
                     </Select>
                 </div>
             </div>
+             {category && renderCategorySpecificFields() && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {renderCategorySpecificFields()}
+              </div>
+            )}
             <div className="space-y-2">
               <Label htmlFor="description">Description *</Label>
               <Textarea
