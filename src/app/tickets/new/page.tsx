@@ -22,7 +22,7 @@ import {
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { customers, agents, allOrders, allProducts } from '@/lib/data';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Phone } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 import { Combobox } from '@/components/ui/combobox';
@@ -40,6 +40,8 @@ export default function NewTicketPage() {
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('');
   const [categorySpecificData, setCategorySpecificData] = useState<{[key: string]: string}>({});
+
+  const isFromCall = !!searchParams.get('subject')?.includes('Phone Call');
 
   useEffect(() => {
     const customerIdFromParams = searchParams.get('customerId');
@@ -88,9 +90,10 @@ export default function NewTicketPage() {
         });
         return;
     }
-    // In a real app, you would submit this data to your backend
-    // and create a new ticket. Here we just log it and redirect.
-    console.log({
+    
+    const newTicketId = "TKT-007"; // Hardcoded for simulation
+    
+    console.log("Creating ticket:", {
       customerId,
       agentId,
       subject,
@@ -103,8 +106,12 @@ export default function NewTicketPage() {
         title: "Ticket Created",
         description: `New ticket "${subject}" has been successfully created.`,
     });
-
-    router.push('/tickets');
+    
+    if (isFromCall) {
+        router.push(`/tickets/${newTicketId}?call=true`);
+    } else {
+        router.push('/tickets');
+    }
   };
 
   const renderCategorySpecificFields = () => {
@@ -152,9 +159,14 @@ export default function NewTicketPage() {
           </Link>
         </Button>
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Create New Ticket</h1>
+          <h1 className="text-3xl font-bold tracking-tight">
+            {isFromCall ? `Initiate Call & Create Ticket` : `Create New Ticket`}
+            </h1>
           <p className="text-muted-foreground">
-            Fill in the details below to open a new support ticket.
+            {isFromCall 
+                ? `Fill in call details below. A ticket will be created automatically.`
+                : `Fill in the details below to open a new support ticket.`
+            }
           </p>
         </div>
       </div>
@@ -227,10 +239,10 @@ export default function NewTicketPage() {
               </div>
             )}
             <div className="space-y-2">
-              <Label htmlFor="description">Description *</Label>
+              <Label htmlFor="description">Description / Call Purpose *</Label>
               <Textarea
                 id="description"
-                placeholder="Please describe the issue in detail..."
+                placeholder="Please describe the issue or purpose of the call in detail..."
                 className="min-h-[150px]"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
@@ -241,7 +253,14 @@ export default function NewTicketPage() {
             <Button variant="ghost" asChild>
               <Link href="/tickets">Cancel</Link>
             </Button>
-            <Button type="submit">Create Ticket</Button>
+            {isFromCall ? (
+                 <Button type="submit">
+                    <Phone className="mr-2 h-4 w-4" />
+                    Start Call & Create Ticket
+                 </Button>
+            ) : (
+                <Button type="submit">Create Ticket</Button>
+            )}
           </CardFooter>
         </Card>
       </form>

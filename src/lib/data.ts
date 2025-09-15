@@ -143,6 +143,16 @@ const interactions: Interaction[] = [
     agent: agents[0],
     ticketId: 'TKT-006',
     content: 'Ticket auto-closed after 24 hours of resolution.'
+  },
+  {
+    id: 'int-16',
+    type: 'Call',
+    channel: 'Phone',
+    date: '2024-07-26T10:00:00Z',
+    duration: '2m 30s',
+    agent: agents[0],
+    ticketId: 'TKT-007',
+    content: 'Initiated call to discuss return of ORD-001.'
   }
 ];
 
@@ -243,7 +253,7 @@ export const customers: Customer[] = [
   },
 ];
 
-export const tickets: Ticket[] = [
+export let tickets: Ticket[] = [
   {
     id: 'TKT-001',
     customerId: 'cus-1',
@@ -315,6 +325,18 @@ export const tickets: Ticket[] = [
     createdAt: '2024-07-20T10:00:00Z',
     updatedAt: '2024-07-21T11:00:00Z',
     interactions: interactions.filter(i => i.ticketId === 'TKT-006').sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
+  },
+  {
+    id: 'TKT-007',
+    customerId: 'cus-1',
+    customerName: 'John Doe',
+    customerAvatarUrl: 'https://picsum.photos/seed/1/40/40',
+    subject: 'Phone Call with John Doe',
+    status: 'New',
+    agent: agents[0],
+    createdAt: '2024-07-26T10:00:00Z',
+    updatedAt: '2024-07-26T10:00:00Z',
+    interactions: interactions.filter(i => i.ticketId === 'TKT-007').sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
   }
 ].sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
 

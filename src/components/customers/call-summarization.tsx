@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { Button } from '../ui/button';
-import { FileAudio, Sparkles, Loader, Play, Pause } from 'lucide-react';
+import { FileAudio, Sparkles, Loader2, Play, Pause } from 'lucide-react';
 import { summarizeCall, SummarizeCallOutput } from '@/ai/flows/summarize-call';
 import { useToast } from '@/hooks/use-toast';
 import { Interaction } from '@/lib/types';
@@ -54,7 +54,7 @@ export function CallSummarization({ interaction }: CallSummarizationProps) {
         </div>
         <Button onClick={handleSummarize} disabled={isLoading}>
           {isLoading ? (
-            <Loader className="mr-2 h-4 w-4 animate-spin" />
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
           ) : (
             <Sparkles className="mr-2 h-4 w-4" />
           )}
