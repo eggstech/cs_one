@@ -1,7 +1,7 @@
 
 'use client';
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -31,13 +31,26 @@ const ticketCategories = ['Order', 'Product', 'Staffs', 'Policy', 'Other'];
 
 export default function NewTicketPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { toast } = useToast();
-  const [customerId, setCustomerId] = useState('');
+
+  const [customerId, setCustomerId] = useState(searchParams.get('customerId') || '');
   const [agentId, setAgentId] = useState('');
-  const [subject, setSubject] = useState('');
+  const [subject, setSubject] = useState(searchParams.get('subject') || '');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('');
   const [categorySpecificData, setCategorySpecificData] = useState<{[key: string]: string}>({});
+
+  useEffect(() => {
+    const customerIdFromParams = searchParams.get('customerId');
+    const subjectFromParams = searchParams.get('subject');
+    if (customerIdFromParams) {
+      setCustomerId(customerIdFromParams);
+    }
+    if (subjectFromParams) {
+      setSubject(subjectFromParams);
+    }
+  }, [searchParams]);
 
   const customerOptions = customers
     .filter(c => c.name !== 'Unrecognized Caller')

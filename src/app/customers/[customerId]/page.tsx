@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Edit, Tag, Trophy } from "lucide-react";
+import { ArrowLeft, Edit, Tag, Trophy, Phone } from "lucide-react";
 import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
 import { LinkedIdentities } from "@/components/customers/linked-identities";
@@ -34,6 +34,8 @@ export default function CustomerProfilePage({ params }: { params: { customerId: 
     Silver: "text-slate-400",
     Gold: "text-yellow-500",
   }
+
+  const callLink = `/tickets/new?customerId=${customer.id}&subject=${encodeURIComponent(`Phone Call with ${customer.name}`)}`;
 
   return (
     <div className="flex-1 space-y-4 p-8 pt-6">
@@ -69,9 +71,16 @@ export default function CustomerProfilePage({ params }: { params: { customerId: 
                 <CardTitle>Customer Details</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3 text-sm">
-                <div className="flex justify-between">
+                <div className="flex justify-between items-center">
                     <span className="text-muted-foreground">Phone</span>
-                    <span className="font-medium">{customer.phone}</span>
+                    <div className="flex items-center gap-2">
+                        <span className="font-medium">{customer.phone}</span>
+                         <Button variant="outline" size="icon" className="h-8 w-8" asChild>
+                            <Link href={callLink}>
+                                <Phone className="h-4 w-4" />
+                            </Link>
+                        </Button>
+                    </div>
                 </div>
                 <Separator />
                 <div className="flex justify-between">
