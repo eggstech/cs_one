@@ -144,6 +144,56 @@ export default function TicketDetailPage({ params }: { params: { ticketId: strin
       <div className="grid gap-6 md:grid-cols-3">
         <div className="md:col-span-2 space-y-6">
           <Card>
+            <CardContent className="p-6">
+              <Tabs defaultValue="note" className="w-full" onValueChange={(value) => setReplyType(value as any)}>
+                  <TabsList>
+                      <TabsTrigger value="note"><StickyNote className="mr-2 h-4 w-4" />Add Note</TabsTrigger>
+                      <TabsTrigger value="email"><Mail className="mr-2 h-4 w-4" />Send Email</TabsTrigger>
+                      <TabsTrigger value="chat"><MessageSquare className="mr-2 h-4 w-4"/>Send Chat</TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="note" className="mt-4">
+                      <div className="space-y-4">
+                          <Label htmlFor="new-note" className="text-sm font-medium">Internal Note</Label>
+                          <Textarea 
+                            id="new-note" 
+                            placeholder="Add an internal note for your team..." 
+                            value={newInteractionContent}
+                            onChange={(e) => setNewInteractionContent(e.target.value)}
+                            className="min-h-24"
+                          />
+                      </div>
+                  </TabsContent>
+                  <TabsContent value="email" className="mt-4">
+                      <div className="space-y-4">
+                          <Input defaultValue={`Re: ${ticket.subject}`} placeholder="Subject"/>
+                          <Textarea 
+                            placeholder="Compose your email reply..." 
+                            value={newInteractionContent}
+                            onChange={(e) => setNewInteractionContent(e.target.value)}
+                            className="min-h-40"
+                          />
+                      </div>
+                  </TabsContent>
+                  <TabsContent value="chat" className="mt-4">
+                      <div className="space-y-4">
+                          <Textarea 
+                            placeholder="Type your chat message..." 
+                            value={newInteractionContent}
+                            onChange={(e) => setNewInteractionContent(e.target.value)}
+                            className="min-h-24"
+                          />
+                      </div>
+                  </TabsContent>
+              </Tabs>
+              <div className="w-full flex justify-end mt-4">
+                  <Button onClick={handleAddReply}>
+                      <Send className="mr-2 h-4 w-4" />
+                      Send {replyType}
+                  </Button>
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
             <CardHeader>
               <CardTitle>Interaction History</CardTitle>
             </CardHeader>
@@ -158,54 +208,6 @@ export default function TicketDetailPage({ params }: { params: { ticketId: strin
                 ))}
               </div>
             </CardContent>
-            <CardFooter className="flex flex-col items-start gap-2 border-t pt-6">
-                <Tabs defaultValue="note" className="w-full" onValueChange={(value) => setReplyType(value as any)}>
-                    <TabsList>
-                        <TabsTrigger value="note"><StickyNote className="mr-2 h-4 w-4" />Add Note</TabsTrigger>
-                        <TabsTrigger value="email"><Mail className="mr-2 h-4 w-4" />Send Email</TabsTrigger>
-                        <TabsTrigger value="chat"><MessageSquare className="mr-2 h-4 w-4"/>Send Chat</TabsTrigger>
-                    </TabsList>
-                    <TabsContent value="note" className="mt-4">
-                        <div className="space-y-4">
-                           <Label htmlFor="new-note" className="text-sm font-medium">Internal Note</Label>
-                            <Textarea 
-                              id="new-note" 
-                              placeholder="Add an internal note for your team..." 
-                              value={newInteractionContent}
-                              onChange={(e) => setNewInteractionContent(e.target.value)}
-                              className="min-h-24"
-                            />
-                        </div>
-                    </TabsContent>
-                    <TabsContent value="email" className="mt-4">
-                        <div className="space-y-4">
-                            <Input defaultValue={`Re: ${ticket.subject}`} placeholder="Subject"/>
-                            <Textarea 
-                              placeholder="Compose your email reply..." 
-                              value={newInteractionContent}
-                              onChange={(e) => setNewInteractionContent(e.target.value)}
-                              className="min-h-40"
-                            />
-                        </div>
-                    </TabsContent>
-                    <TabsContent value="chat" className="mt-4">
-                        <div className="space-y-4">
-                           <Textarea 
-                              placeholder="Type your chat message..." 
-                              value={newInteractionContent}
-                              onChange={(e) => setNewInteractionContent(e.target.value)}
-                              className="min-h-24"
-                            />
-                        </div>
-                    </TabsContent>
-                </Tabs>
-                <div className="w-full flex justify-end mt-4">
-                    <Button onClick={handleAddReply}>
-                        <Send className="mr-2 h-4 w-4" />
-                        Send {replyType}
-                    </Button>
-                </div>
-            </CardFooter>
           </Card>
         </div>
         <div className="space-y-6">
