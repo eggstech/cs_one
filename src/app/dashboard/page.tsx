@@ -1,5 +1,4 @@
 'use client';
-import { useState } from 'react';
 import {
   Card,
   CardContent,
@@ -8,11 +7,9 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import {
-  PhoneIncoming,
   Ticket,
-  Users,
 } from 'lucide-react';
-import { customers, tickets } from '@/lib/data';
+import { tickets } from '@/lib/data';
 import {
   Table,
   TableBody,
@@ -24,34 +21,13 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { ScreenPop } from '@/components/screen-pop';
 import { formatDistanceToNow } from 'date-fns';
-import { Customer } from '@/lib/types';
 
 export default function DashboardPage() {
-  const [isScreenPopVisible, setScreenPopVisible] = useState(false);
-  const [activeCustomer, setActiveCustomer] = useState<Customer>(customers[0]);
-  
-  const handleSimulateCall = (customer: Customer) => {
-    setActiveCustomer(customer);
-    setScreenPopVisible(true);
-  };
-
   return (
     <div className="flex-1 space-y-4 p-8 pt-6">
       <div className="flex items-center justify-between space-y-2">
         <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-        <div className="flex items-center space-x-2">
-          <Button onClick={() => handleSimulateCall(customers[0])}>
-            <PhoneIncoming className="mr-2 h-4 w-4" />
-            Simulate Known Caller
-          </Button>
-           <Button variant="outline" onClick={() => handleSimulateCall(customers[2])}>
-            <PhoneIncoming className="mr-2 h-4 w-4" />
-            Simulate Unknown Caller
-          </Button>
-        </div>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -154,11 +130,6 @@ export default function DashboardPage() {
           </Card>
         </div>
       </div>
-      <ScreenPop
-        customer={activeCustomer}
-        open={isScreenPopVisible}
-        onOpenChange={setScreenPopVisible}
-      />
     </div>
   );
 }

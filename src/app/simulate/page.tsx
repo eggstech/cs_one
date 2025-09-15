@@ -7,21 +7,22 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import {
-  Search,
   PhoneIncoming,
   MessageSquare,
 } from 'lucide-react';
 import { customers } from '@/lib/data';
 import { ScreenPop } from '@/components/screen-pop';
 import { PancakeWidget } from '@/components/pancake-widget';
+import { Customer } from '@/lib/types';
 
 export default function SimulatePage() {
   const [isScreenPopVisible, setScreenPopVisible] = useState(false);
+  const [activeCustomer, setActiveCustomer] = useState<Customer>(customers[0]);
   
-  const handleSimulateCall = () => {
+  const handleSimulateCall = (customer: Customer) => {
+    setActiveCustomer(customer);
     setScreenPopVisible(true);
   };
 
@@ -39,16 +40,19 @@ export default function SimulatePage() {
         <div className="col-span-full lg:col-span-3 space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Tools</CardTitle>
+              <CardTitle>Call Simulations</CardTitle>
+              <CardDescription>
+                Trigger a screen pop for different caller types.
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input placeholder="Search customers..." className="pl-9" />
-              </div>
-              <Button onClick={handleSimulateCall} className="w-full">
+               <Button onClick={() => handleSimulateCall(customers[0])} className="w-full">
                 <PhoneIncoming className="mr-2 h-4 w-4" />
-                Simulate Incoming Call
+                Simulate Known Caller
+              </Button>
+               <Button variant="outline" onClick={() => handleSimulateCall(customers[2])} className="w-full">
+                <PhoneIncoming className="mr-2 h-4 w-4" />
+                Simulate Unknown Caller
               </Button>
             </CardContent>
           </Card>
@@ -69,7 +73,7 @@ export default function SimulatePage() {
         </div>
       </div>
       <ScreenPop
-        customer={customers[2]}
+        customer={activeCustomer}
         open={isScreenPopVisible}
         onOpenChange={setScreenPopVisible}
       />
