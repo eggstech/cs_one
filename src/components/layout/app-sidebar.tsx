@@ -10,16 +10,17 @@ import {
   GitMerge,
   Settings,
   LogOut,
-  ChevronRight,
-  Search,
   Moon,
+  ChevronLeft,
 } from 'lucide-react';
 import { Icons } from '../icons';
-import { Input } from '../ui/input';
 import { Switch } from '../ui/switch';
+import { useState } from 'react';
+import { cn } from '@/lib/utils';
 
 export function AppSidebar() {
   const pathname = usePathname();
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   const navItems = [
     { href: '/dashboard', label: 'Dashboard', icon: <LayoutDashboard className="size-5" /> },
@@ -30,26 +31,46 @@ export function AppSidebar() {
   ];
 
   return (
-    <aside className="w-64 flex flex-col gap-y-4 bg-card p-4 rounded-lg shadow-sm">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
+    <aside className={cn(
+        "flex flex-col gap-y-4 bg-card p-4 shadow-sm transition-all duration-300",
+        isCollapsed ? "w-20 items-center" : "w-64"
+    )}>
+      <div className={cn(
+        "flex items-center justify-between",
+        isCollapsed ? "justify-center" : "justify-between"
+      )}>
+        <div className={cn(
+            "flex items-center gap-3",
+            isCollapsed && "gap-0"
+        )}>
           <Icons.logo className="size-10 text-primary-foreground bg-primary p-2 rounded-lg" />
-          <div className="flex flex-col">
+          <div className={cn("flex flex-col", isCollapsed && "hidden")}>
             <h2 className="text-sm font-semibold tracking-tight text-foreground">
               CS-One
             </h2>
             <p className="text-xs text-muted-foreground">Platform</p>
           </div>
         </div>
-        <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground">
-            <ChevronRight />
+        <Button 
+            variant="ghost" 
+            size="icon" 
+            className={cn("h-7 w-7 text-muted-foreground", isCollapsed && "hidden")}
+            onClick={() => setIsCollapsed(true)}
+        >
+            <ChevronLeft />
         </Button>
       </div>
 
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input placeholder="Search..." className="pl-9 bg-input border-0 focus-visible:ring-primary" />
-      </div>
+       {isCollapsed && (
+         <Button 
+            variant="ghost" 
+            size="icon" 
+            className="h-7 w-7 text-muted-foreground"
+            onClick={() => setIsCollapsed(false)}
+        >
+            <ChevronLeft className="rotate-180" />
+        </Button>
+       )}
       
       <nav className="flex-1">
         <ul className="space-y-2">
@@ -58,11 +79,15 @@ export function AppSidebar() {
               <Button
                 asChild
                 variant={pathname.startsWith(item.href) ? 'default' : 'ghost'}
-                className="w-full justify-start text-base font-normal"
+                className={cn(
+                    "w-full justify-start text-base font-normal",
+                    isCollapsed && "justify-center"
+                )}
+                title={isCollapsed ? item.label : undefined}
               >
                 <Link href={item.href}>
                   {item.icon}
-                  <span>{item.label}</span>
+                  <span className={cn(isCollapsed && "hidden")}>{item.label}</span>
                 </Link>
               </Button>
             </li>
@@ -71,12 +96,21 @@ export function AppSidebar() {
       </nav>
 
       <div className="flex flex-col gap-y-2">
-        <Button variant="ghost" className="w-full justify-start text-base font-normal">
+        <Button variant="ghost" className={cn(
+            "w-full justify-start text-base font-normal",
+            isCollapsed && "justify-center"
+        )} title={isCollapsed ? "Logout" : undefined}>
           <LogOut className="size-5" />
-          <span>Logout</span>
+          <span className={cn(isCollapsed && "hidden")}>Logout</span>
         </Button>
-        <div className="flex items-center justify-between p-2 rounded-md hover:bg-accent">
-            <div className="flex items-center gap-2">
+        <div className={cn(
+            "flex items-center justify-between p-2 rounded-md hover:bg-accent",
+            isCollapsed && "justify-center"
+        )}>
+            <div className={cn(
+                "flex items-center gap-2",
+                isCollapsed && "hidden"
+            )}>
                 <Moon className="size-5 text-muted-foreground" />
                 <span className="text-sm text-muted-foreground">Dark Mode</span>
             </div>
