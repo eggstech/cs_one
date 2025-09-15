@@ -7,15 +7,10 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
 import {
-  Search,
-  PhoneIncoming,
   Ticket,
-  MessageSquare,
 } from 'lucide-react';
-import { tickets, customers } from '@/lib/data';
+import { tickets } from '@/lib/data';
 import {
   Table,
   TableBody,
@@ -28,7 +23,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 import { ScreenPop } from '@/components/screen-pop';
-import { PancakeWidget } from '@/components/pancake-widget';
+import { customers } from '@/lib/data';
 import { formatDistanceToNow } from 'date-fns';
 
 export default function DashboardPage() {
@@ -75,8 +70,8 @@ export default function DashboardPage() {
         </Card>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-        <Card className="col-span-4">
+      <div>
+        <Card>
           <CardHeader>
             <CardTitle>Recent Tickets</CardTitle>
             <CardDescription>
@@ -141,37 +136,6 @@ export default function DashboardPage() {
             </Table>
           </CardContent>
         </Card>
-        <div className="col-span-3 space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Tools</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input placeholder="Search customers..." className="pl-9" />
-              </div>
-              <Button onClick={handleSimulateCall} className="w-full">
-                <PhoneIncoming className="mr-2 h-4 w-4" />
-                Simulate Incoming Call
-              </Button>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <MessageSquare className="h-5 w-5" />
-                Pancake Chat Widget
-              </CardTitle>
-              <CardDescription>
-                Live preview of the smart widget integration.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <PancakeWidget customer={customers[0]} />
-            </CardContent>
-          </Card>
-        </div>
       </div>
       <ScreenPop
         customer={customers[2]}
