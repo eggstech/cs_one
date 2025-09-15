@@ -1,3 +1,4 @@
+
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -20,7 +21,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { customers, agents } from '@/lib/data';
+import { customers, agents, allOrders, allProducts } from '@/lib/data';
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
@@ -44,14 +45,23 @@ export default function NewTicketPage() {
       value: customer.id,
       label: `${customer.name} - ${customer.phone}`
     }));
+    
+  const orderOptions = allOrders.map(order => ({
+    value: order.id,
+    label: `${order.id} - ${customers.find(c => c.orders.some(o => o.id === order.id))?.name}`
+  }));
+
+  const productOptions = allProducts.map(productName => ({
+    value: productName,
+    label: productName
+  }));
 
   const handleCategoryChange = (newCategory: string) => {
     setCategory(newCategory);
     setCategorySpecificData({}); // Reset specific data when category changes
   };
 
-  const handleSpecificDataChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
+  const handleSpecificDataChange = (name: string, value: string) => {
     setCategorySpecificData(prev => ({ ...prev, [name]: value }));
   };
 
@@ -90,12 +100,13 @@ export default function NewTicketPage() {
         return (
           <div className="space-y-2">
             <Label htmlFor="orderId">Order ID *</Label>
-            <Input 
-              id="orderId" 
-              name="orderId"
-              placeholder="e.g., ORD-001" 
-              value={categorySpecificData.orderId || ''}
-              onChange={handleSpecificDataChange}
+            <Combobox
+                options={orderOptions}
+                value={categorySpecificData.orderId}
+                onChange={(value) => handleSpecificDataChange('orderId', value)}
+                placeholder="Select an order"
+                searchPlaceholder="Search by Order ID or Customer..."
+                emptyPlaceholder="No order found."
             />
           </div>
         );
@@ -103,12 +114,13 @@ export default function NewTicketPage() {
         return (
           <div className="space-y-2">
             <Label htmlFor="productSku">Product Name/SKU</Label>
-            <Input 
-              id="productSku" 
-              name="productSku"
-              placeholder="e.g., Stylish Frames"
-              value={categorySpecificData.productSku || ''}
-              onChange={handleSpecificDataChange}
+             <Combobox
+                options={productOptions}
+                value={categorySpecificData.productSku}
+                onChange={(value) => handleSpecificDataChange('productSku', value)}
+                placeholder="Select a product"
+                searchPlaceholder="Search for a product..."
+                emptyPlaceholder="No product found."
             />
           </div>
         );

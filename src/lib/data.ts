@@ -1,4 +1,4 @@
-import { Customer, Ticket, Interaction } from './types';
+import { Customer, Ticket, Interaction, Order } from './types';
 
 export const agents = [
   { id: 'agent-1', name: 'Alex Green', avatarUrl: 'https://picsum.photos/seed/101/40/40' },
@@ -321,3 +321,6 @@ export const tickets: Ticket[] = [
 export const getCustomer = (id: string) => customers.find(c => c.id === id);
 export const getTicket = (id: string) => tickets.find(t => t.id === id);
 export const getTicketsForCustomer = (customerId: string) => tickets.filter(t => t.customerId === customerId);
+
+export const allOrders: Order[] = customers.flatMap(c => c.orders);
+export const allProducts: string[] = [...new Set(customers.flatMap(c => c.orders).flatMap(o => o.items).map(i => i.name))];
