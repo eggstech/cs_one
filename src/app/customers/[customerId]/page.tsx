@@ -29,16 +29,31 @@ import { EditCustomerProfileDialog } from "@/components/customers/edit-customer-
 
 export default function CustomerProfilePage({ params: { customerId } }: { params: { customerId: string } }) {
   const { toast } = useToast();
-  const [customer, setCustomer] = useState<Customer | undefined>(getCustomer(customerId));
+  const [customer, setCustomer] = useState<Customer | undefined>(undefined);
   const [hydrated, setHydrated] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   useEffect(() => {
+    setCustomer(getCustomer(customerId));
     setHydrated(true);
-  }, []);
+  }, [customerId]);
 
   if (!customer) {
-    notFound();
+    // Show a loading state or a skeleton screen while the customer is being fetched.
+    return (
+      <div className="flex-1 space-y-4 p-8 pt-6">
+        <div className="h-16 w-full animate-pulse rounded-lg bg-muted"></div>
+        <div className="grid gap-6 lg:grid-cols-3">
+            <div className="lg:col-span-1 space-y-6">
+                <div className="h-64 w-full animate-pulse rounded-lg bg-muted"></div>
+                <div className="h-48 w-full animate-pulse rounded-lg bg-muted"></div>
+            </div>
+             <div className="lg:col-span-2">
+                <div className="h-96 w-full animate-pulse rounded-lg bg-muted"></div>
+            </div>
+        </div>
+      </div>
+    );
   }
   
   const handleAddInteraction = (interactionData: Omit<Interaction, 'id' | 'date' | 'agent'>) => {
