@@ -22,6 +22,8 @@ interface ScreenPopProps {
 
 export function ScreenPop({ customer, open, onOpenChange }: ScreenPopProps) {
   const isKnownCaller = customer.name !== 'Unrecognized Caller';
+  
+  const newTicketLink = `/tickets/new?customerId=${customer.id}&subject=${encodeURIComponent(`Phone Call with ${customer.name}`)}`;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -51,16 +53,25 @@ export function ScreenPop({ customer, open, onOpenChange }: ScreenPopProps) {
             </div>
           </div>
         </div>
-        <DialogFooter>
+        <DialogFooter className="sm:justify-start">
           {isKnownCaller ? (
-            <Link href={`/customers/${customer.id}`} passHref legacyBehavior>
-              <Button className="w-full" onClick={() => onOpenChange(false)}>
-                View Profile <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            </Link>
+            <div className="flex w-full gap-2">
+                <Button variant="outline" className="flex-1" onClick={() => onOpenChange(false)} asChild>
+                    <Link href={`/customers/${customer.id}`}>
+                        View Profile <ArrowRight className="ml-2 h-4 w-4" />
+                    </Link>
+                </Button>
+                <Button className="flex-1" onClick={() => onOpenChange(false)} asChild>
+                    <Link href={newTicketLink}>
+                        Create Ticket <UserPlus className="ml-2 h-4 w-4" />
+                    </Link>
+                </Button>
+            </div>
           ) : (
-             <Button className="w-full bg-accent text-accent-foreground hover:bg-accent/90">
-              Create New Profile <UserPlus className="ml-2 h-4 w-4" />
+             <Button className="w-full bg-accent text-accent-foreground hover:bg-accent/90" onClick={() => onOpenChange(false)} asChild>
+                 <Link href="/tickets/new">
+                    Create New Profile <UserPlus className="ml-2 h-4 w-4" />
+                </Link>
             </Button>
           )}
         </DialogFooter>

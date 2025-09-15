@@ -27,11 +27,14 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { ScreenPop } from '@/components/screen-pop';
 import { formatDistanceToNow } from 'date-fns';
+import { Customer } from '@/lib/types';
 
 export default function DashboardPage() {
   const [isScreenPopVisible, setScreenPopVisible] = useState(false);
+  const [activeCustomer, setActiveCustomer] = useState<Customer>(customers[0]);
   
-  const handleSimulateCall = () => {
+  const handleSimulateCall = (customer: Customer) => {
+    setActiveCustomer(customer);
     setScreenPopVisible(true);
   };
 
@@ -40,9 +43,13 @@ export default function DashboardPage() {
       <div className="flex items-center justify-between space-y-2">
         <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
         <div className="flex items-center space-x-2">
-          <Button onClick={handleSimulateCall}>
+          <Button onClick={() => handleSimulateCall(customers[0])}>
             <PhoneIncoming className="mr-2 h-4 w-4" />
-            Simulate Incoming Call
+            Simulate Known Caller
+          </Button>
+           <Button variant="outline" onClick={() => handleSimulateCall(customers[2])}>
+            <PhoneIncoming className="mr-2 h-4 w-4" />
+            Simulate Unknown Caller
           </Button>
         </div>
       </div>
@@ -148,7 +155,7 @@ export default function DashboardPage() {
         </div>
       </div>
       <ScreenPop
-        customer={customers[2]}
+        customer={activeCustomer}
         open={isScreenPopVisible}
         onOpenChange={setScreenPopVisible}
       />
