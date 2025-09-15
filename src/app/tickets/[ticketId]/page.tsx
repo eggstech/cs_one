@@ -29,14 +29,14 @@ import {
 } from "@/components/ui/select";
 import { Interaction, Ticket } from "@/lib/types";
 
-export default function TicketDetailPage({ params }: { params: { ticketId: string } }) {
+export default function TicketDetailPage({ params: { ticketId } }: { params: { ticketId: string } }) {
   const searchParams = useSearchParams();
   const isCallActive = searchParams.get('call') === 'true';
 
   const [ticket, setTicket] = useState<Ticket | undefined>(undefined);
 
   useEffect(() => {
-    const foundTicket = getTicket(params.ticketId);
+    const foundTicket = getTicket(ticketId);
     if (foundTicket) {
         if(isCallActive && !foundTicket.interactions.some(i => i.id === 'int-call-active')) {
             const callInteraction: Interaction = {
@@ -56,7 +56,7 @@ export default function TicketDetailPage({ params }: { params: { ticketId: strin
     } else {
         notFound();
     }
-  }, [params.ticketId, isCallActive]);
+  }, [ticketId, isCallActive]);
   
   const customer = ticket ? getCustomer(ticket.customerId) : undefined;
   const agents = allAgents;
