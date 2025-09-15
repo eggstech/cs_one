@@ -1,6 +1,6 @@
 
 'use client';
-import { getCustomer, getTicketsForCustomer } from "@/lib/data";
+import { getCustomer, getTicketsForCustomer, agents } from "@/lib/data";
 import { notFound } from "next/navigation";
 import {
   Card,
@@ -22,9 +22,13 @@ import { TicketHistory } from "@/components/customers/ticket-history";
 import { DebtHistoryCard } from "@/components/customers/debt-history-card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useState, useEffect } from 'react';
+import { Customer, Interaction } from "@/lib/types";
+import { LogInteractionForm } from "@/components/customers/log-interaction-form";
+import { useToast } from "@/hooks/use-toast";
 
 export default function CustomerProfilePage({ params }: { params: { customerId: string } }) {
-  const customer = getCustomer(params.customerId);
+  const { toast } = useToast();
+  const [customer, setCustomer] = useState<Customer | undefined>(getCustomer(params.customerId));
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
@@ -34,6 +38,24 @@ export default function CustomerProfilePage({ params }: { params: { customerId: 
   if (!customer) {
     notFound();
   }
+  
+  const handleAddInteraction = (interactionData: Omit<Interaction, 'id' | 'date' | 'agent'>) => {
+    if (!customer) return;
+
+    const newInteraction: Interaction = {
+      id: `int-${Date.now()}`,
+      date: new Date().toISOString(),
+      agent: agents[0], // Assuming current user is agent-1
+      ...interactionData,
+    };
+    
+    setCustomer(prevCustomer => prevCustomer ? { ...prevCustomer, interactions: [newInteraction, ...prevCustomer.interactions] } : undefined);
+
+    toast({
+        title: `Interaction Added`,
+        description: `Your ${interactionData.channel} interaction has been logged.`,
+    });
+  };
 
   const customerTickets = getTicketsForCustomer(params.customerId);
 
@@ -149,7 +171,8 @@ export default function CustomerProfilePage({ params }: { params: { customerId: 
               <TabsTrigger value="profile">Profile Details</TabsTrigger>
             </TabsList>
             
-            <TabsContent value="timeline">
+            <TabsContent value="timeline" className="space-y-6">
+              <LogInteractionForm onAddInteraction={handleAddInteraction} />
               <InteractionTimeline interactions={customer.interactions} />
             </TabsContent>
             
