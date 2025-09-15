@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -13,6 +14,7 @@ import {
   Moon,
   ChevronLeft,
   Play,
+  Phone,
 } from 'lucide-react';
 import { Icons } from '../icons';
 import { Switch } from '../ui/switch';
@@ -27,6 +29,7 @@ export function AppSidebar() {
     { href: '/dashboard', label: 'Dashboard', icon: <LayoutDashboard className="size-5" /> },
     { href: '/customers', label: 'Customers', icon: <Users className="size-5" /> },
     { href: '/tickets', label: 'Tickets', icon: <Ticket className="size-5" /> },
+    { href: '/call-history', label: 'Call History', icon: <Phone className="size-5" /> },
     { href: '/merge', label: 'Merge Profiles', icon: <GitMerge className="size-5" /> },
     { href: '/simulate', label: 'Simulate', icon: <Play className="size-5" /> },
     { href: '/settings', label: 'Settings', icon: <Settings className="size-5" /> },

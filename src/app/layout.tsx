@@ -4,7 +4,7 @@ import { Toaster } from "@/components/ui/toaster"
 import { AppSidebar } from '@/components/layout/app-sidebar';
 
 export const metadata: Metadata = {
-  title: 'CS-One Platform',
+  title: 'CS-One: Call Center',
   description: 'The unified platform for customer service excellence.',
 };
 
