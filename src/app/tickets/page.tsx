@@ -17,7 +17,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { tickets as allTickets, agents } from '@/lib/data';
-import { PlusCircle, Filter } from 'lucide-react';
+import { PlusCircle, Filter, GitMerge } from 'lucide-react';
 import Link from 'next/link';
 import { format } from 'date-fns';
 import {
@@ -76,6 +76,12 @@ export default function TicketsPage() {
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
+           <Button variant="outline" asChild>
+            <Link href="/tickets/merge">
+              <GitMerge className="mr-2 h-4 w-4" />
+              Merge Tickets
+            </Link>
+          </Button>
           <Button asChild>
             <Link href="/tickets/new">
               <PlusCircle className="mr-2 h-4 w-4" />
