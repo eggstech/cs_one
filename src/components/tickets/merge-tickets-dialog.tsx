@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, GitMerge, X, Ticket as TicketIcon } from 'lucide-react';
+import { Search, GitMerge, X } from 'lucide-react';
 import { tickets as allTickets } from '@/lib/data';
 import { Ticket } from '@/lib/types';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -18,9 +18,18 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogDescription,
+    DialogFooter
+} from '@/components/ui/dialog';
 import Link from 'next/link';
+import { useToast } from '@/hooks/use-toast';
 
-function TicketSearch({ onSelectTicket, excludedId }: { onSelectTicket: (ticket: Ticket) => void, excludedId?: string }) {
+function TicketSearch({ onSelectTicket, excludedId, title }: { onSelectTicket: (ticket: Ticket) => void, excludedId?: string, title: string }) {
   const [query, setQuery] = useState('');
   const filteredTickets = query 
     ? allTickets.filter(t => 
@@ -29,16 +38,16 @@ function TicketSearch({ onSelectTicket, excludedId }: { onSelectTicket: (ticket:
     : [];
 
   return (
-    <Card className="h-full">
+    <Card className="h-full flex flex-col">
       <CardHeader>
-        <CardTitle className="text-lg">Find a Ticket</CardTitle>
+        <CardTitle className="text-lg">{title}</CardTitle>
         <div className="relative pt-2">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input placeholder="Search by ID or subject..." className="pl-9" value={query} onChange={(e) => setQuery(e.target.value)} />
         </div>
       </CardHeader>
-      <CardContent>
-        <div className="space-y-2 max-h-96 overflow-y-auto">
+      <CardContent className='overflow-y-auto'>
+        <div className="space-y-2">
           {filteredTickets.map(ticket => (
             <div key={ticket.id} onClick={() => onSelectTicket(ticket)} className="flex items-center justify-between p-2 rounded-lg hover:bg-muted cursor-pointer">
               <div className='flex flex-col gap-1'>
@@ -89,36 +98,67 @@ function TicketDisplay({ ticket, onClear, isPrimary }: { ticket: Ticket, onClear
   )
 }
 
-export function MergeTicketsClient() {
+interface MergeTicketsDialogProps {
+    open: boolean;
+    onOpenChange: (open: boolean) => void;
+}
+
+export function MergeTicketsDialog({ open, onOpenChange }: MergeTicketsDialogProps) {
   const [primaryTicket, setPrimaryTicket] = useState<Ticket | null>(null);
   const [sourceTicket, setSourceTicket] = useState<Ticket | null>(null);
   const [isConfirming, setIsConfirming] = useState(false);
+  const { toast } = useToast();
 
   const handleMerge = () => {
-    // In a real app, you'd call an API here to perform the merge
-    console.log(`Merging ${sourceTicket?.id} into ${primaryTicket?.id}`);
+    toast({
+        title: "Tickets Merged",
+        description: `Ticket ${sourceTicket?.id} has been successfully merged into ${primaryTicket?.id}.`,
+    })
     setIsConfirming(false);
     setPrimaryTicket(null);
     setSourceTicket(null);
+    onOpenChange(false);
+  }
+
+  const handleCancel = () => {
+      setPrimaryTicket(null);
+      setSourceTicket(null);
+      onOpenChange(false);
   }
 
   return (
     <>
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
-      {primaryTicket ? <TicketDisplay ticket={primaryTicket} onClear={() => setPrimaryTicket(null)} isPrimary={true}/> : <TicketSearch onSelectTicket={setPrimaryTicket} excludedId={sourceTicket?.id} />}
-      {sourceTicket ? <TicketDisplay ticket={sourceTicket} onClear={() => setSourceTicket(null)} isPrimary={false} /> : <TicketSearch onSelectTicket={setSourceTicket} excludedId={primaryTicket?.id} />}
-    </div>
-    {primaryTicket && sourceTicket && (
-        <div className="flex justify-center mt-6">
-            <Button size="lg" onClick={() => setIsConfirming(true)} disabled={primaryTicket.customerId !== sourceTicket.customerId}>
-                <GitMerge className="mr-2 h-5 w-5" />
-                Merge Tickets
-            </Button>
-        </div>
-    )}
-     {primaryTicket && sourceTicket && primaryTicket.customerId !== sourceTicket.customerId && (
-        <p className='text-center text-destructive text-sm mt-2'>Tickets must belong to the same customer to be merged.</p>
-    )}
+    <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="max-w-4xl h-[70vh] flex flex-col">
+            <DialogHeader>
+                <DialogTitle>Merge Duplicate Tickets</DialogTitle>
+                <DialogDescription>
+                    Select a source ticket and a primary ticket. Interactions from the source will be moved to the primary, and the source ticket will be closed.
+                </DialogDescription>
+            </DialogHeader>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start flex-1 overflow-hidden">
+                <div className='flex flex-col h-full'>
+                    {primaryTicket ? <TicketDisplay ticket={primaryTicket} onClear={() => setPrimaryTicket(null)} isPrimary={true}/> : <TicketSearch title="Select Primary Ticket" onSelectTicket={setPrimaryTicket} excludedId={sourceTicket?.id} />}
+                </div>
+                <div className='flex flex-col h-full'>
+                    {sourceTicket ? <TicketDisplay ticket={sourceTicket} onClear={() => setSourceTicket(null)} isPrimary={false} /> : <TicketSearch title="Select Source Ticket" onSelectTicket={setSourceTicket} excludedId={primaryTicket?.id} />}
+                </div>
+            </div>
+             {primaryTicket && sourceTicket && primaryTicket.customerId !== sourceTicket.customerId && (
+                <p className='text-center text-destructive text-sm'>Tickets must belong to the same customer to be merged.</p>
+            )}
+            <DialogFooter>
+                <Button variant="ghost" onClick={handleCancel}>Cancel</Button>
+                <Button 
+                    onClick={() => setIsConfirming(true)} 
+                    disabled={!primaryTicket || !sourceTicket || primaryTicket.customerId !== sourceTicket.customerId}
+                >
+                    <GitMerge className="mr-2 h-5 w-5" />
+                    Merge Tickets
+                </Button>
+            </DialogFooter>
+        </DialogContent>
+    </Dialog>
 
     <AlertDialog open={isConfirming} onOpenChange={setIsConfirming}>
         <AlertDialogContent>

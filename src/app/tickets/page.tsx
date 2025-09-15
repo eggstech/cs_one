@@ -29,12 +29,14 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Ticket } from '@/lib/types';
+import { MergeTicketsDialog } from '@/components/tickets/merge-tickets-dialog';
 
 const ticketStatuses: Ticket['status'][] = ['New', 'In-Progress', 'Resolved', 'Closed'];
 
 export default function TicketsPage() {
   const [tickets, setTickets] = useState<Ticket[]>(allTickets);
   const [statusFilters, setStatusFilters] = useState<Ticket['status'][]>(['New', 'In-Progress']);
+  const [isMergeDialogOpen, setIsMergeDialogOpen] = useState(false);
 
   const handleFilterChange = (status: Ticket['status'], checked: boolean) => {
     setStatusFilters(prev => {
@@ -76,11 +78,9 @@ export default function TicketsPage() {
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
-           <Button variant="outline" asChild>
-            <Link href="/tickets/merge">
+           <Button variant="outline" onClick={() => setIsMergeDialogOpen(true)}>
               <GitMerge className="mr-2 h-4 w-4" />
               Merge Tickets
-            </Link>
           </Button>
           <Button asChild>
             <Link href="/tickets/new">
@@ -160,6 +160,7 @@ export default function TicketsPage() {
           </Table>
         </CardContent>
       </Card>
+      <MergeTicketsDialog open={isMergeDialogOpen} onOpenChange={setIsMergeDialogOpen} />
     </div>
   );
 }
