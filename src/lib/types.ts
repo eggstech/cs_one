@@ -16,8 +16,10 @@ export type Interaction = {
     avatarUrl: string;
   };
   recordingUrl?: string; // for calls
+  transcript?: string; // for calls
   content: string; // for notes/chats
   ticketId?: string;
+  isLive?: boolean; // for live interactions like calls
 };
 
 export type Order = {
