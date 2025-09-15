@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState, useEffect } from "react";
@@ -51,7 +52,7 @@ const interactionChannels = [
 
 type InteractionChannel = typeof interactionChannels[number]['value'];
 
-export default function TicketDetailPage({ params }: { params: { ticketId: string } }) {
+export default function TicketDetailPage({ params: { ticketId } }: { params: { ticketId: string } }) {
   const { toast } = useToast();
   const searchParams = useSearchParams();
   const isCallActive = searchParams.get('call') === 'true';
@@ -70,8 +71,6 @@ export default function TicketDetailPage({ params }: { params: { ticketId: strin
       nextAction: '',
       transcript: ''
   });
-
-  const { ticketId } = params;
 
   useEffect(() => {
     const foundTicket = getTicket(ticketId);
