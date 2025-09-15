@@ -24,6 +24,9 @@ import { customers, agents } from '@/lib/data';
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
+import { Combobox } from '@/components/ui/combobox';
+
+const ticketCategories = ['Order', 'Staffs', 'Policy', 'Product', 'Other'];
 
 export default function NewTicketPage() {
   const router = useRouter();
@@ -32,10 +35,18 @@ export default function NewTicketPage() {
   const [agentId, setAgentId] = useState('');
   const [subject, setSubject] = useState('');
   const [description, setDescription] = useState('');
+  const [category, setCategory] = useState('');
+
+  const customerOptions = customers
+    .filter(c => c.name !== 'Unrecognized Caller')
+    .map(customer => ({
+      value: customer.id,
+      label: `${customer.name} - ${customer.phone}`
+    }));
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!customerId || !subject || !description) {
+    if (!customerId || !subject || !description || !category) {
         toast({
             variant: "destructive",
             title: "Missing Fields",
@@ -50,6 +61,7 @@ export default function NewTicketPage() {
       agentId,
       subject,
       description,
+      category,
     });
     
     toast({
@@ -87,18 +99,14 @@ export default function NewTicketPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="customer">Customer *</Label>
-                <Select value={customerId} onValueChange={setCustomerId}>
-                  <SelectTrigger id="customer">
-                    <SelectValue placeholder="Select a customer" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {customers.filter(c => c.name !== 'Unrecognized Caller').map(customer => (
-                      <SelectItem key={customer.id} value={customer.id}>
-                        {customer.name} - {customer.email}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Combobox 
+                    options={customerOptions}
+                    value={customerId}
+                    onChange={setCustomerId}
+                    placeholder="Select a customer"
+                    searchPlaceholder="Search customer by name or phone..."
+                    emptyPlaceholder="No customer found."
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="agent">Assign to Agent</Label>
@@ -116,14 +124,31 @@ export default function NewTicketPage() {
                 </Select>
               </div>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="subject">Subject *</Label>
-              <Input 
-                id="subject" 
-                placeholder="e.g., Issue with my recent order" 
-                value={subject}
-                onChange={(e) => setSubject(e.target.value)}
-              />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                    <Label htmlFor="subject">Subject *</Label>
+                    <Input 
+                        id="subject" 
+                        placeholder="e.g., Issue with my recent order" 
+                        value={subject}
+                        onChange={(e) => setSubject(e.target.value)}
+                    />
+                </div>
+                 <div className="space-y-2">
+                    <Label htmlFor="category">Category *</Label>
+                    <Select value={category} onValueChange={setCategory}>
+                        <SelectTrigger id="category">
+                            <SelectValue placeholder="Select a category" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {ticketCategories.map(cat => (
+                                <SelectItem key={cat} value={cat}>
+                                    {cat}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
             </div>
             <div className="space-y-2">
               <Label htmlFor="description">Description *</Label>
