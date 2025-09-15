@@ -2,15 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import {
-  Sidebar,
-  SidebarHeader,
-  SidebarContent,
-  SidebarFooter,
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton,
-} from '@/components/ui/sidebar';
+import { Button } from '@/components/ui/button';
 import {
   LayoutDashboard,
   Ticket,
@@ -18,103 +10,79 @@ import {
   GitMerge,
   Settings,
   LogOut,
+  ChevronRight,
+  Search,
+  Moon,
 } from 'lucide-react';
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
-import { Separator } from '../ui/separator';
 import { Icons } from '../icons';
+import { Input } from '../ui/input';
+import { Switch } from '../ui/switch';
 
 export function AppSidebar() {
   const pathname = usePathname();
 
+  const navItems = [
+    { href: '/dashboard', label: 'Dashboard', icon: <LayoutDashboard className="size-5" /> },
+    { href: '/customers', label: 'Customers', icon: <Users className="size-5" /> },
+    { href: '/tickets', label: 'Tickets', icon: <Ticket className="size-5" /> },
+    { href: '/merge', label: 'Merge Profiles', icon: <GitMerge className="size-5" /> },
+    { href: '/settings', label: 'Settings', icon: <Settings className="size-5" /> },
+  ];
+
   return (
-    <Sidebar collapsible="icon">
-      <SidebarHeader>
-        <div className="flex items-center gap-3 p-2">
-          <Icons.logo className="size-8 text-primary" />
+    <aside className="w-64 flex flex-col gap-y-4 bg-card p-4 rounded-lg shadow-sm">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <Icons.logo className="size-10 text-primary-foreground bg-primary p-2 rounded-lg" />
           <div className="flex flex-col">
-            <h2 className="text-lg font-semibold tracking-tight text-foreground">
+            <h2 className="text-sm font-semibold tracking-tight text-foreground">
               CS-One
             </h2>
             <p className="text-xs text-muted-foreground">Platform</p>
           </div>
         </div>
-      </SidebarHeader>
-      <SidebarContent className="p-2">
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              asChild
-              isActive={pathname === '/dashboard'}
-              tooltip="Dashboard"
-            >
-              <Link href="/dashboard">
-                <LayoutDashboard />
-                <span>Dashboard</span>
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-           <SidebarMenuItem>
-            <SidebarMenuButton
-              asChild
-              isActive={pathname.startsWith('/customers')}
-              tooltip="Customers"
-            >
-              <Link href="/customers">
-                <Users />
-                <span>Customers</span>
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              asChild
-              isActive={pathname.startsWith('/tickets')}
-              tooltip="Tickets"
-            >
-              <Link href="/tickets">
-                <Ticket />
-                <span>Tickets</span>
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              asChild
-              isActive={pathname === '/merge'}
-              tooltip="Merge Profiles"
-            >
-              <Link href="/merge">
-                <GitMerge />
-                <span>Merge Profiles</span>
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarContent>
-      <SidebarFooter className="p-2">
-         <Separator className="my-2 bg-border/50" />
-         <SidebarMenu>
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild tooltip="Settings">
-                <Link href="#">
-                  <Settings />
-                  <span>Settings</span>
+        <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground">
+            <ChevronRight />
+        </Button>
+      </div>
+
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Input placeholder="Search..." className="pl-9 bg-input border-0 focus-visible:ring-primary" />
+      </div>
+      
+      <nav className="flex-1">
+        <ul className="space-y-2">
+          {navItems.map((item) => (
+            <li key={item.href}>
+              <Button
+                asChild
+                variant={pathname.startsWith(item.href) ? 'default' : 'ghost'}
+                className="w-full justify-start text-base font-normal"
+              >
+                <Link href={item.href}>
+                  {item.icon}
+                  <span>{item.label}</span>
                 </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          </SidebarMenu>
-          <div className="flex items-center gap-3 p-2 rounded-lg bg-card mt-2">
-             <Avatar className="h-10 w-10">
-                <AvatarImage src="https://picsum.photos/seed/100/40/40" alt="Admin" data-ai-hint="person face" />
-                <AvatarFallback>AD</AvatarFallback>
-            </Avatar>
-            <div className="flex flex-col">
-                <span className="font-medium text-sm text-foreground">Admin User</span>
-                <span className="text-xs text-muted-foreground">admin@cs-one.com</span>
+              </Button>
+            </li>
+          ))}
+        </ul>
+      </nav>
+
+      <div className="flex flex-col gap-y-2">
+        <Button variant="ghost" className="w-full justify-start text-base font-normal">
+          <LogOut className="size-5" />
+          <span>Logout</span>
+        </Button>
+        <div className="flex items-center justify-between p-2 rounded-md hover:bg-accent">
+            <div className="flex items-center gap-2">
+                <Moon className="size-5 text-muted-foreground" />
+                <span className="text-sm text-muted-foreground">Dark Mode</span>
             </div>
-            <LogOut className="ml-auto size-5 text-muted-foreground cursor-pointer hover:text-foreground" />
-          </div>
-      </SidebarFooter>
-    </Sidebar>
+            <Switch />
+        </div>
+      </div>
+    </aside>
   );
 }

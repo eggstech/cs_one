@@ -2,20 +2,13 @@ import { LucideProps } from "lucide-react";
 
 export const Icons = {
   logo: (props: LucideProps) => (
-    <svg 
-      xmlns="http://www.w3.org/2000/svg" 
-      width="24" 
-      height="24" 
-      viewBox="0 0 24 24" 
-      fill="none" 
-      stroke="currentColor" 
-      strokeWidth="2" 
-      strokeLinecap="round" 
-      strokeLinejoin="round" 
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 256 256"
+      fill="currentColor"
       {...props}
     >
-      <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/>
-      <path d="m9 12 2 2 4-4"/>
+      <path d="M208,32H48A16,16,0,0,0,32,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32Zm-48,80H112a8,8,0,0,1,0-16h48a8,8,0,0,1,0,16Zm-28,48a8,8,0,0,1-8,8H88a8,8,0,0,1,0-16h36A8,8,0,0,1,132,160Z" />
     </svg>
   ),
   facebook: (props: LucideProps) => (
