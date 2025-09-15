@@ -27,9 +27,9 @@ import { LogInteractionForm } from "@/components/customers/log-interaction-form"
 import { useToast } from "@/hooks/use-toast";
 import { EditCustomerProfileDialog } from "@/components/customers/edit-customer-profile-dialog";
 
-export default function CustomerProfilePage({ params }: { params: { customerId: string } }) {
+export default function CustomerProfilePage({ params: { customerId } }: { params: { customerId: string } }) {
   const { toast } = useToast();
-  const [customer, setCustomer] = useState<Customer | undefined>(getCustomer(params.customerId));
+  const [customer, setCustomer] = useState<Customer | undefined>(getCustomer(customerId));
   const [hydrated, setHydrated] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
@@ -69,7 +69,7 @@ export default function CustomerProfilePage({ params }: { params: { customerId: 
     setIsEditDialogOpen(false);
   }
 
-  const customerTickets = getTicketsForCustomer(params.customerId);
+  const customerTickets = getTicketsForCustomer(customerId);
 
   const levelColors: { [key: string]: string } = {
     Bronze: "text-[#cd7f32]",
