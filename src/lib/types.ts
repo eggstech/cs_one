@@ -1,5 +1,6 @@
+
 export type Identity = {
-  channel: 'Phone' | 'Facebook' | 'Zalo' | 'Email';
+  channel: 'Phone' | 'Facebook' | 'Zalo' | 'Email' | 'Instagram';
   identifier: string;
 };
 
@@ -17,9 +18,17 @@ export type Interaction = {
   };
   recordingUrl?: string; // for calls
   transcript?: string; // for calls
-  content: string; // for notes/chats
+  content: string; // for notes/chats/purpose
   ticketId?: string;
   isLive?: boolean; // for live interactions like calls
+  
+  // Detailed call fields
+  startTime?: string;
+  endTime?: string;
+  purpose?: string;
+  discussion?: string;
+  output?: string;
+  nextAction?: string;
 };
 
 export type Order = {
@@ -94,3 +103,5 @@ export type Ticket = {
   updatedAt: string;
   interactions: Interaction[];
 };
+
+    
