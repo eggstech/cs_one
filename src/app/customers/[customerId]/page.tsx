@@ -1,3 +1,5 @@
+
+'use client';
 import { getCustomer, getTicketsForCustomer } from "@/lib/data";
 import { notFound } from "next/navigation";
 import {
@@ -19,9 +21,15 @@ import { Badge } from "@/components/ui/badge";
 import { TicketHistory } from "@/components/customers/ticket-history";
 import { DebtHistoryCard } from "@/components/customers/debt-history-card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useState, useEffect } from 'react';
 
 export default function CustomerProfilePage({ params }: { params: { customerId: string } }) {
   const customer = getCustomer(params.customerId);
+  const [hydrated, setHydrated] = useState(false);
+
+  useEffect(() => {
+    setHydrated(true);
+  }, []);
 
   if (!customer) {
     notFound();
@@ -36,6 +44,23 @@ export default function CustomerProfilePage({ params }: { params: { customerId: 
   }
 
   const callLink = `/tickets/new?customerId=${customer.id}&subject=${encodeURIComponent(`Phone Call with ${customer.name}`)}`;
+
+  if (!hydrated) {
+    return (
+      <div className="flex-1 space-y-4 p-8 pt-6">
+        <div className="h-16 w-full animate-pulse rounded-lg bg-muted"></div>
+        <div className="grid gap-6 lg:grid-cols-3">
+            <div className="lg:col-span-1 space-y-6">
+                <div className="h-64 w-full animate-pulse rounded-lg bg-muted"></div>
+                <div className="h-48 w-full animate-pulse rounded-lg bg-muted"></div>
+            </div>
+             <div className="lg:col-span-2">
+                <div className="h-96 w-full animate-pulse rounded-lg bg-muted"></div>
+            </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex-1 space-y-4 p-8 pt-6">

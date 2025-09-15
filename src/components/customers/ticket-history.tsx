@@ -1,3 +1,5 @@
+
+'use client';
 import {
   Card,
   CardContent,
@@ -17,12 +19,18 @@ import { Badge } from "@/components/ui/badge";
 import { Ticket } from "@/lib/types";
 import { formatDistanceToNow } from "date-fns";
 import Link from "next/link";
+import { useState, useEffect } from "react";
 
 interface TicketHistoryProps {
   tickets: Ticket[];
 }
 
 export function TicketHistory({ tickets }: TicketHistoryProps) {
+  const [hydrated, setHydrated] = useState(false);
+  useEffect(() => {
+    setHydrated(true);
+  }, []);
+
   return (
     <Card>
       <CardHeader>
@@ -62,7 +70,7 @@ export function TicketHistory({ tickets }: TicketHistoryProps) {
                   </Badge>
                 </TableCell>
                 <TableCell className="text-right">
-                    {formatDistanceToNow(new Date(ticket.updatedAt), { addSuffix: true })}
+                    {hydrated && formatDistanceToNow(new Date(ticket.updatedAt), { addSuffix: true })}
                 </TableCell>
               </TableRow>
             )) : (

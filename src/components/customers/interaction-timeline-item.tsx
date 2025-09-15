@@ -1,3 +1,4 @@
+
 'use client';
 import { Interaction } from "@/lib/types";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
@@ -48,8 +49,10 @@ export function InteractionTimelineItem({ interaction, onCallEnd }: InteractionT
   const [callDuration, setCallDuration] = useState(0);
   const [isSummarizing, setIsSummarizing] = useState(false);
   const [summary, setSummary] = useState<SummarizeCallOutput | null>(null);
+  const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
+    setHydrated(true);
     let timer: NodeJS.Timeout;
     if (callStatus === 'calling' && interaction.isLive) {
       timer = setInterval(() => {
@@ -121,9 +124,11 @@ export function InteractionTimelineItem({ interaction, onCallEnd }: InteractionT
                 <CardTitle className="text-base">{interaction.agent.name}</CardTitle>
                 <div className="text-xs text-muted-foreground flex items-center gap-1">
                     <Clock className="size-3"/>
-                    <time dateTime={interaction.date} title={format(new Date(interaction.date), 'PPpp')}>
-                        {formatDistanceToNow(new Date(interaction.date), { addSuffix: true })}
-                    </time>
+                    {hydrated && (
+                      <time dateTime={interaction.date} title={format(new Date(interaction.date), 'PPpp')}>
+                          {formatDistanceToNow(new Date(interaction.date), { addSuffix: true })}
+                      </time>
+                    )}
                 </div>
               </div>
             <CardDescription className="text-xs">{interaction.type} via {interaction.channel}</CardDescription>

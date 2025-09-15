@@ -22,8 +22,14 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 import { formatDistanceToNow } from 'date-fns';
+import { useState, useEffect } from 'react';
 
 export default function DashboardPage() {
+  const [hydrated, setHydrated] = useState(false);
+  useEffect(() => {
+    setHydrated(true);
+  }, []);
+
   return (
     <div className="flex-1 space-y-4 p-8 pt-6">
       <div className="flex items-center justify-between space-y-2">
@@ -120,7 +126,7 @@ export default function DashboardPage() {
                         </Badge>
                       </TableCell>
                        <TableCell>
-                        {formatDistanceToNow(new Date(ticket.updatedAt), { addSuffix: true })}
+                        {hydrated && formatDistanceToNow(new Date(ticket.updatedAt), { addSuffix: true })}
                       </TableCell>
                     </TableRow>
                   ))}
