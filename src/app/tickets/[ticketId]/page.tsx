@@ -20,6 +20,9 @@ import { format } from "date-fns";
 import {
   ArrowLeft,
   Send,
+  StickyNote,
+  Mail,
+  MessageSquare
 } from "lucide-react";
 import Link from "next/link";
 import { InteractionTimelineItem } from "@/components/customers/interaction-timeline-item";
@@ -32,19 +35,20 @@ import {
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { Interaction, Ticket } from "@/lib/types";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
 
 export default function TicketDetailPage({ params }: { params: { ticketId: string } }) {
   const { ticketId } = params;
   const [ticket, setTicket] = useState<Ticket | undefined>(undefined);
   const [newNote, setNewNote] = useState("");
+  const [replyType, setReplyType] = useState<'Note' | 'Email' | 'Chat'>('Note');
 
   useEffect(() => {
     const foundTicket = getTicket(ticketId);
     if (foundTicket) {
         setTicket(foundTicket);
     } else {
-        // In a real app, you might show a "not found" message.
-        // For now, notFound() will trigger a 404 page.
         notFound();
     }
   }, [ticketId]);
@@ -53,7 +57,6 @@ export default function TicketDetailPage({ params }: { params: { ticketId: strin
   const agents = allAgents;
   
   if (!ticket) {
-     // Render loading or a placeholder on the server and initial client render
     return <div className="flex-1 space-y-4 p-8 pt-6">Loading ticket details...</div>;
   }
 
@@ -69,20 +72,20 @@ export default function TicketDetailPage({ params }: { params: { ticketId: strin
     }
   };
   
-  const handleAddNote = () => {
+  const handleAddReply = () => {
     if (!ticket || newNote.trim() === "") return;
     
-    const note: Interaction = {
+    const newInteraction: Interaction = {
         id: `int-${Date.now()}`,
-        type: 'Note',
-        channel: 'System',
+        type: replyType,
+        channel: replyType === 'Note' ? 'System' : 'Email', // Simplified for now
         date: new Date().toISOString(),
         agent: agents[0], // Assuming the current user is agent-1
         content: newNote,
         ticketId: ticket.id,
     };
     
-    setTicket(prevTicket => prevTicket ? { ...prevTicket, interactions: [note, ...prevTicket.interactions], updatedAt: new Date().toISOString() } : undefined);
+    setTicket(prevTicket => prevTicket ? { ...prevTicket, interactions: [newInteraction, ...prevTicket.interactions], updatedAt: new Date().toISOString() } : undefined);
     setNewNote("");
   };
 
@@ -118,17 +121,50 @@ export default function TicketDetailPage({ params }: { params: { ticketId: strin
               </div>
             </CardContent>
             <CardFooter className="flex flex-col items-start gap-2 border-t pt-6">
-                <Label htmlFor="new-note" className="text-sm font-medium">Add a new note or reply</Label>
-                <div className="w-full relative">
-                    <Textarea 
-                      id="new-note" 
-                      placeholder="Type your message here..." 
-                      className="pr-12"
-                      value={newNote}
-                      onChange={(e) => setNewNote(e.target.value)}
-                    />
-                    <Button variant="ghost" size="icon" className="absolute right-2 top-1/2 -translate-y-1/2" onClick={handleAddNote}>
-                        <Send className="h-5 w-5 text-primary" />
+                <Tabs defaultValue="note" className="w-full" onValueChange={(value) => setReplyType(value as any)}>
+                    <TabsList>
+                        <TabsTrigger value="note"><StickyNote className="mr-2 h-4 w-4" />Add Note</TabsTrigger>
+                        <TabsTrigger value="email"><Mail className="mr-2 h-4 w-4" />Send Email</TabsTrigger>
+                        <TabsTrigger value="chat"><MessageSquare className="mr-2 h-4 w-4"/>Send Chat</TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="note" className="mt-4">
+                        <div className="space-y-4">
+                           <Label htmlFor="new-note" className="text-sm font-medium">Internal Note</Label>
+                            <Textarea 
+                              id="new-note" 
+                              placeholder="Add an internal note for your team..." 
+                              value={newNote}
+                              onChange={(e) => setNewNote(e.target.value)}
+                              className="min-h-24"
+                            />
+                        </div>
+                    </TabsContent>
+                    <TabsContent value="email" className="mt-4">
+                        <div className="space-y-4">
+                            <Input defaultValue={`Re: ${ticket.subject}`} placeholder="Subject"/>
+                            <Textarea 
+                              placeholder="Compose your email reply..." 
+                              value={newNote}
+                              onChange={(e) => setNewNote(e.target.value)}
+                              className="min-h-40"
+                            />
+                        </div>
+                    </TabsContent>
+                    <TabsContent value="chat" className="mt-4">
+                        <div className="space-y-4">
+                           <Textarea 
+                              placeholder="Type your chat message..." 
+                              value={newNote}
+                              onChange={(e) => setNewNote(e.target.value)}
+                              className="min-h-24"
+                            />
+                        </div>
+                    </TabsContent>
+                </Tabs>
+                <div className="w-full flex justify-end mt-4">
+                    <Button onClick={handleAddReply}>
+                        <Send className="mr-2 h-4 w-4" />
+                        Send
                     </Button>
                 </div>
             </CardFooter>
