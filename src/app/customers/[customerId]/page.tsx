@@ -25,11 +25,13 @@ import { useState, useEffect } from 'react';
 import { Customer, Interaction } from "@/lib/types";
 import { LogInteractionForm } from "@/components/customers/log-interaction-form";
 import { useToast } from "@/hooks/use-toast";
+import { EditCustomerProfileDialog } from "@/components/customers/edit-customer-profile-dialog";
 
 export default function CustomerProfilePage({ params }: { params: { customerId: string } }) {
   const { toast } = useToast();
   const [customer, setCustomer] = useState<Customer | undefined>(getCustomer(params.customerId));
   const [hydrated, setHydrated] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   useEffect(() => {
     setHydrated(true);
@@ -56,6 +58,16 @@ export default function CustomerProfilePage({ params }: { params: { customerId: 
         description: `Your ${interactionData.channel} interaction has been logged.`,
     });
   };
+
+  const handleUpdateCustomer = (updatedData: Partial<Customer>) => {
+    if (!customer) return;
+    setCustomer(prevCustomer => prevCustomer ? { ...prevCustomer, ...updatedData } : undefined);
+    toast({
+      title: "Profile Updated",
+      description: "Customer details have been successfully updated.",
+    });
+    setIsEditDialogOpen(false);
+  }
 
   const customerTickets = getTicketsForCustomer(params.customerId);
 
@@ -85,6 +97,7 @@ export default function CustomerProfilePage({ params }: { params: { customerId: 
   }
 
   return (
+    <>
     <div className="flex-1 space-y-4 p-8 pt-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
@@ -104,7 +117,7 @@ export default function CustomerProfilePage({ params }: { params: { customerId: 
             </div>
           </div>
         </div>
-        <Button variant="outline">
+        <Button variant="outline" onClick={() => setIsEditDialogOpen(true)}>
           <Edit className="mr-2 h-4 w-4" />
           Edit Profile
         </Button>
@@ -192,5 +205,12 @@ export default function CustomerProfilePage({ params }: { params: { customerId: 
         </div>
       </div>
     </div>
+    <EditCustomerProfileDialog
+      open={isEditDialogOpen}
+      onOpenChange={setIsEditDialogOpen}
+      customer={customer}
+      onSave={handleUpdateCustomer}
+    />
+    </>
   );
 }
