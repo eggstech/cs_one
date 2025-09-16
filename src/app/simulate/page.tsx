@@ -50,6 +50,10 @@ export default function SimulatePage() {
                 Test and preview various platform integrations and tools.
             </p>
             </div>
+             <Button variant="outline" size="sm" onClick={() => setIsSidebarWide(!isSidebarWide)}>
+                {isSidebarWide ? <PanelRightClose className="mr-2 h-4 w-4"/> : <PanelRightOpen className="mr-2 h-4 w-4" />}
+                Toggle Sidebar Size
+            </Button>
         </div>
           <Card>
             <CardHeader>
@@ -77,22 +81,7 @@ export default function SimulatePage() {
           isSidebarWide ? "lg:col-span-1" : "lg:col-span-1"
         )}>
          <Card className="flex-1">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                 <CardTitle className="flex items-center gap-2">
-                    <MessageSquare className="h-5 w-5" />
-                    Compact View
-                </CardTitle>
-                <Button variant="outline" size="sm" onClick={() => setIsSidebarWide(!isSidebarWide)}>
-                    {isSidebarWide ? <PanelRightClose className="mr-2 h-4 w-4"/> : <PanelRightOpen className="mr-2 h-4 w-4" />}
-                    Toggle Size
-                </Button>
-              </div>
-              <CardDescription>
-                A compact preview of customer context, like a browser extension.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
+            <CardContent className="h-full">
               <CompactAppSidebar 
                 view={sidebarView}
                 onSetView={setSidebarView}
