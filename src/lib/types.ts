@@ -16,6 +16,7 @@ export type Interaction = {
     name: string;
     avatarUrl: string;
   };
+  callType?: 'Incoming' | 'Outgoing' | 'Missed';
   recordingUrl?: string; // for calls
   transcript?: string; // for calls
   content: string; // for notes/chats/purpose

@@ -11,6 +11,7 @@ const interactions: Interaction[] = [
     id: 'int-1',
     type: 'Call',
     channel: 'Phone',
+    callType: 'Incoming',
     date: '2024-07-22T14:30:00Z',
     duration: '5m 32s',
     agent: agents[0],
@@ -71,6 +72,7 @@ const interactions: Interaction[] = [
   {
     id: 'int-8',
     type: 'Call',
+    callType: 'Incoming',
     channel: 'Phone',
     date: '2024-07-24T11:00:00Z',
     duration: '12m 15s',
@@ -100,6 +102,7 @@ const interactions: Interaction[] = [
   {
     id: 'int-11',
     type: 'Call',
+    callType: 'Outgoing',
     channel: 'Phone',
     date: '2024-07-25T10:00:00Z',
     duration: '8m 45s',
@@ -147,12 +150,22 @@ const interactions: Interaction[] = [
   {
     id: 'int-16',
     type: 'Call',
+    callType: 'Outgoing',
     channel: 'Phone',
     date: '2024-07-26T10:00:00Z',
     duration: '2m 30s',
     agent: agents[0],
     ticketId: 'TKT-007',
     content: 'Initiated call to discuss return of ORD-001.'
+  },
+  {
+    id: 'int-17',
+    type: 'Call',
+    callType: 'Missed',
+    channel: 'Phone',
+    date: '2024-07-26T12:00:00Z',
+    agent: agents[1],
+    content: 'Missed call from customer.'
   }
 ];
 
@@ -216,7 +229,7 @@ export const customers: Customer[] = [
       { channel: 'Phone', identifier: '555-0102' },
       { channel: 'Zalo', identifier: 'janesmith.zalo' },
     ],
-    interactions: [interactions[4], interactions[5], interactions[6], interactions[9]].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
+    interactions: [interactions[4], interactions[5], interactions[6], interactions[9], interactions[16]].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
     orders: [
        {
         id: 'ORD-002',

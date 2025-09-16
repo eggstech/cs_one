@@ -23,10 +23,23 @@ import Link from 'next/link';
 import { format } from 'date-fns';
 import { CallDetailModal } from '@/components/call-history/call-detail-modal';
 import { Badge } from '@/components/ui/badge';
-import { Ticket } from 'lucide-react';
+import { Ticket, PhoneIncoming, PhoneOutgoing, PhoneMissed } from 'lucide-react';
 
 interface CallLog extends Interaction {
     customer: Customer;
+}
+
+const getCallTypeIcon = (callType?: Interaction['callType']) => {
+    switch (callType) {
+        case 'Incoming':
+            return <PhoneIncoming className="h-4 w-4 text-green-500" />;
+        case 'Outgoing':
+            return <PhoneOutgoing className="h-4 w-4 text-blue-500" />;
+        case 'Missed':
+            return <PhoneMissed className="h-4 w-4 text-red-500" />;
+        default:
+            return null;
+    }
 }
 
 export default function CallHistoryPage() {
@@ -70,6 +83,7 @@ export default function CallHistoryPage() {
             <TableHeader>
               <TableRow>
                 <TableHead>Call ID</TableHead>
+                <TableHead>Type</TableHead>
                 <TableHead>Customer</TableHead>
                 <TableHead>Agent</TableHead>
                 <TableHead>Date</TableHead>
@@ -82,6 +96,12 @@ export default function CallHistoryPage() {
               {callLogs.map((log) => (
                 <TableRow key={log.id} onClick={() => setSelectedLog(log)} className="cursor-pointer">
                     <TableCell className="font-mono">{log.id}</TableCell>
+                    <TableCell>
+                        <div className="flex items-center gap-2">
+                           {getCallTypeIcon(log.callType)}
+                           <span className="capitalize">{log.callType || '-'}</span>
+                        </div>
+                    </TableCell>
                     <TableCell>
                         <Link href={`/customers/${log.customer.id}`} onClick={(e) => e.stopPropagation()}>
                         <div className="flex items-center gap-3">
