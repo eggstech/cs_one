@@ -65,6 +65,7 @@ export function LogInteractionForm({ onAddInteraction, ticketId, isCallActive: i
   const [interactionChannel, setInteractionChannel] = useState<InteractionChannel>('Note');
   const [interactionContent, setInteractionContent] = useState("");
   const [isCallLive, setIsCallLive] = useState(initialIsCallActive);
+  const [isCallCompleted, setIsCallCompleted] = useState(false);
   const [callDuration, setCallDuration] = useState(0);
    const [callDetails, setCallDetails] = useState({
       purpose: '',
@@ -75,6 +76,7 @@ export function LogInteractionForm({ onAddInteraction, ticketId, isCallActive: i
 
   useEffect(() => {
     setIsCallLive(initialIsCallActive);
+    setIsCallCompleted(false); // Reset on prop change
     if(initialIsCallActive) {
       setCallDuration(0);
     }
@@ -141,19 +143,18 @@ export function LogInteractionForm({ onAddInteraction, ticketId, isCallActive: i
     
     onAddInteraction(interactionData);
 
-    // Reset state
+    // Reset state to show the normal form again
+    setIsCallCompleted(true);
     setCallDuration(0);
     setCallDetails({ purpose: '', discussion: '', output: '', nextAction: '' });
-    // This assumes we want to exit call mode after logging. 
-    // We might need a prop to control this if we want to stay in "post-call" mode.
-    setIsCallLive(false); 
-    if (initialIsCallActive) {
-      // If this form was opened for a call, we might want to reset the URL
-      // but that's a router concern, outside this component's scope.
-    }
+    setInteractionContent("");
+    setInteractionChannel('Note');
+    
+    // We can't change the prop, so we manage this with internal state.
+    // The component will now render the default form.
   }
 
-  if (initialIsCallActive) {
+  if (initialIsCallActive && !isCallCompleted) {
     return (
         <Card>
             <CardHeader>
@@ -207,7 +208,7 @@ export function LogInteractionForm({ onAddInteraction, ticketId, isCallActive: i
              <CardFooter className="justify-end">
                 <Button onClick={handleLogCallInteraction} disabled={isCallLive}>
                     <Save className="mr-2 h-4 w-4" />
-                    Log Call
+                    Log Interaction
                 </Button>
             </CardFooter>
         </Card>
