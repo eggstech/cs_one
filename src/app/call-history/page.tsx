@@ -21,6 +21,7 @@ import { customers } from '@/lib/data';
 import { Interaction, Customer } from '@/lib/types';
 import Link from 'next/link';
 import { format } from 'date-fns';
+import { CallDetailModal } from '@/components/call-history/call-detail-modal';
 
 interface CallLog extends Interaction {
     customer: Customer;
@@ -28,6 +29,7 @@ interface CallLog extends Interaction {
 
 export default function CallHistoryPage() {
     const [callLogs, setCallLogs] = useState<CallLog[]>([]);
+    const [selectedLog, setSelectedLog] = useState<CallLog | null>(null);
     const [hydrated, setHydrated] = useState(false);
 
     useEffect(() => {
@@ -50,6 +52,7 @@ export default function CallHistoryPage() {
     }
 
   return (
+    <>
     <div className="flex-1 space-y-4 p-8 pt-6">
       <div className="flex items-center justify-between">
         <div>
@@ -68,14 +71,14 @@ export default function CallHistoryPage() {
                 <TableHead>Agent</TableHead>
                 <TableHead>Date</TableHead>
                 <TableHead>Duration</TableHead>
-                <TableHead>Subject</TableHead>
+                <TableHead>Content</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {callLogs.map((log) => (
-                <TableRow key={log.id}>
+                <TableRow key={log.id} onClick={() => setSelectedLog(log)} className="cursor-pointer">
                     <TableCell>
-                        <Link href={`/customers/${log.customer.id}`}>
+                        <Link href={`/customers/${log.customer.id}`} onClick={(e) => e.stopPropagation()}>
                         <div className="flex items-center gap-3">
                             <Avatar className="h-8 w-8">
                             <AvatarImage
@@ -109,5 +112,15 @@ export default function CallHistoryPage() {
         </CardContent>
       </Card>
     </div>
+     <CallDetailModal 
+        interaction={selectedLog}
+        open={!!selectedLog}
+        onOpenChange={(isOpen) => {
+            if (!isOpen) {
+                setSelectedLog(null);
+            }
+        }}
+    />
+    </>
   );
 }
