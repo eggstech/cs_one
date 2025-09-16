@@ -1,9 +1,10 @@
 
+
 'use client';
-import { Interaction } from "@/lib/types";
+import { Interaction, Ticket } from "@/lib/types";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../ui/card";
-import { Phone, MessageSquare, StickyNote, Ticket, Clock, Link as LinkIcon, PlusCircle } from "lucide-react";
+import { Phone, MessageSquare, StickyNote, Ticket as TicketIcon, Clock, Link as LinkIcon, PlusCircle } from "lucide-react";
 import { format, formatDistanceToNow } from 'date-fns';
 import { useState, useEffect } from "react";
 import { Button } from "../ui/button";
@@ -16,6 +17,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "../ui/badge";
 import { CallSummarization } from "./call-summarization";
+import { getTicket } from "@/lib/data";
 
 interface InteractionTimelineItemProps {
   interaction: Interaction;
@@ -30,7 +32,7 @@ const getIcon = (type: Interaction['type']) => {
     case 'Note':
       return <StickyNote className="h-5 w-5" />;
     case 'Ticket':
-      return <Ticket className="h-5 w-5" />;
+      return <TicketIcon className="h-5 w-5" />;
     default:
       return <MessageSquare className="h-5 w-5" />;
   }
@@ -38,10 +40,15 @@ const getIcon = (type: Interaction['type']) => {
 
 export function InteractionTimelineItem({ interaction }: InteractionTimelineItemProps) {
   const [hydrated, setHydrated] = useState(false);
+  const [ticket, setTicket] = useState<Ticket | undefined>(undefined);
 
   useEffect(() => {
     setHydrated(true);
-  }, []);
+    if (interaction.ticketId) {
+        const foundTicket = getTicket(interaction.ticketId);
+        setTicket(foundTicket);
+    }
+  }, [interaction.ticketId]);
   
   const iconBgColor = 
     interaction.type === 'Call' ? 'bg-blue-500/20 text-blue-400' :
@@ -51,6 +58,11 @@ export function InteractionTimelineItem({ interaction }: InteractionTimelineItem
 
   const isCall = interaction.type === 'Call';
   const content = isCall ? interaction.purpose || interaction.content : interaction.content;
+
+  const ticketStatusVariant = 
+    ticket?.status === 'New' ? 'default' :
+    ticket?.status === 'In-Progress' ? 'outline' :
+    'secondary';
 
   return (
     <div className="relative flex items-start gap-4">
@@ -86,10 +98,10 @@ export function InteractionTimelineItem({ interaction }: InteractionTimelineItem
           </CardContent>
             <CardFooter className="p-4 pt-0 flex items-center justify-end gap-4 text-xs text-muted-foreground">
                <div className="w-full flex justify-end">
-                {interaction.ticketId ? (
+                {interaction.ticketId && ticket ? (
                     <Link href={`/tickets/${interaction.ticketId}`}>
-                        <Badge>
-                            <Ticket className="mr-2 h-3 w-3" />
+                        <Badge variant={ticketStatusVariant}>
+                            <TicketIcon className="mr-2 h-3 w-3" />
                             {interaction.ticketId}
                         </Badge>
                     </Link>

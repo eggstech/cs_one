@@ -1,12 +1,14 @@
 
+
 'use client';
-import { Interaction } from "@/lib/types";
+import { Interaction, Ticket } from "@/lib/types";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import { Phone, MessageSquare, StickyNote, Ticket } from "lucide-react";
+import { Phone, MessageSquare, StickyNote, Ticket as TicketIcon } from "lucide-react";
 import { formatDistanceToNow } from 'date-fns';
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Badge } from "../ui/badge";
+import { getTicket } from "@/lib/data";
 
 interface CompactInteractionTimelineProps {
   interactions: Interaction[];
@@ -21,11 +23,34 @@ const getIcon = (type: Interaction['type']) => {
     case 'Note':
       return <StickyNote className="h-4 w-4" />;
     case 'Ticket':
-        return <Ticket className="h-4 w-4" />;
+        return <TicketIcon className="h-4 w-4" />;
     default:
       return <MessageSquare className="h-4 w-4" />;
   }
 };
+
+const TicketBadge = ({ ticketId }: { ticketId: string }) => {
+    const [ticket, setTicket] = useState<Ticket | undefined>(undefined);
+    useEffect(() => {
+        if(ticketId) {
+            setTicket(getTicket(ticketId));
+        }
+    }, [ticketId]);
+
+    const ticketStatusVariant = 
+        ticket?.status === 'New' ? 'default' :
+        ticket?.status === 'In-Progress' ? 'outline' :
+        'secondary';
+
+    return (
+        <Link href={`/tickets/${ticketId}`} className="mt-2 inline-block">
+            <Badge variant={ticketStatusVariant} className="hover:bg-accent">
+                <TicketIcon className="mr-2 h-3 w-3" />
+                {ticketId}
+            </Badge>
+        </Link>
+    )
+}
 
 export function CompactInteractionTimeline({ interactions }: CompactInteractionTimelineProps) {
   const [hydrated, setHydrated] = useState(false);
@@ -54,14 +79,7 @@ export function CompactInteractionTimeline({ interactions }: CompactInteractionT
                         </span>
                     </div>
                     <p className="text-sm mt-1">{interaction.content}</p>
-                    {interaction.ticketId && (
-                        <Link href={`/tickets/${interaction.ticketId}`} className="mt-2 inline-block">
-                             <Badge variant="outline" className="hover:bg-accent">
-                                <Ticket className="mr-2 h-3 w-3" />
-                                {interaction.ticketId}
-                            </Badge>
-                        </Link>
-                    )}
+                    {interaction.ticketId && <TicketBadge ticketId={interaction.ticketId} />}
                 </div>
             </div>
         ))}
