@@ -9,8 +9,8 @@ import {
   DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog';
-import { Button } from './ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
+import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Phone, UserPlus, ArrowRight, X, PhoneIncoming } from 'lucide-react';
 import { Customer } from '@/lib/types';
 import Link from 'next/link';

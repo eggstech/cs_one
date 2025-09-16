@@ -14,12 +14,17 @@ import {
   MessageSquare,
   PanelRightOpen,
   PanelRightClose,
+  Users,
+  Ticket,
+  Phone,
 } from 'lucide-react';
 import { customers } from '@/lib/data';
-import { ScreenPop } from '@/components/screen-pop';
+import { ScreenPop } from '@/app/screen-pop';
 import { Customer } from '@/lib/types';
 import { CompactAppSidebar } from '@/components/simulate/compact-app-sidebar';
 import { cn } from '@/lib/utils';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
 
 export type SidebarView = 
     | { type: 'customerList' }
@@ -30,11 +35,13 @@ export default function SimulatePage() {
   const [activeCustomer, setActiveCustomer] = useState<Customer>(customers[0]);
   const [isSidebarWide, setIsSidebarWide] = useState(false);
   const [sidebarView, setSidebarView] = useState<SidebarView>({ type: 'customerList' });
+  const [activeTab, setActiveTab] = useState('customers');
   
   const handleSimulateCall = (customer: Customer) => {
     setActiveCustomer(customer);
     setScreenPopVisible(true);
     // When a call comes in, show that customer in the sidebar
+    setActiveTab('customers');
     setSidebarView({ type: 'customerDetail', customerId: customer.id });
   };
 
@@ -81,12 +88,22 @@ export default function SimulatePage() {
           isSidebarWide ? "lg:col-span-1" : "lg:col-span-1"
         )}>
          <Card className="flex-1">
-            <CardContent className="h-full">
-              <CompactAppSidebar 
-                view={sidebarView}
-                onSetView={setSidebarView}
-                isWide={isSidebarWide}
-              />
+            <CardContent className="h-full p-4">
+               <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col">
+                  <TabsList className="grid w-full grid-cols-3">
+                    <TabsTrigger value="customers"><Users className="h-4 w-4" /></TabsTrigger>
+                    <TabsTrigger value="tickets"><Ticket className="h-4 w-4" /></TabsTrigger>
+                    <TabsTrigger value="calls"><Phone className="h-4 w-4" /></TabsTrigger>
+                  </TabsList>
+                  <div className="flex-1 mt-4">
+                    <CompactAppSidebar 
+                        activeTab={activeTab}
+                        view={sidebarView}
+                        onSetView={setSidebarView}
+                        isWide={isSidebarWide}
+                    />
+                  </div>
+                </Tabs>
             </CardContent>
           </Card>
       </div>
