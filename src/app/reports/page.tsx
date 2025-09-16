@@ -60,6 +60,28 @@ const csatData = [
   { name: 'Bad', value: 100, fill: 'hsl(var(--chart-5))' },
 ];
 
+const csatConfig: ChartConfig = {
+  value: {
+    label: "Count",
+  },
+  Excellent: {
+    label: "Excellent",
+    color: "hsl(var(--chart-2))",
+  },
+  Good: {
+    label: "Good",
+    color: "hsl(var(--chart-1))",
+  },
+  Neutral: {
+    label: "Neutral",
+    color: "hsl(var(--chart-4))",
+  },
+  Bad: {
+    label: "Bad",
+    color: "hsl(var(--chart-5))",
+  },
+};
+
 export default function ReportsPage() {
   const metrics = [
     {
@@ -188,28 +210,30 @@ export default function ReportsPage() {
           <CardContent className="flex flex-col items-center justify-center gap-4">
             <div className="text-5xl font-bold tracking-tighter">92%</div>
             <p className="text-sm text-muted-foreground">Overall Satisfaction</p>
-            <ResponsiveContainer width="100%" height={120}>
-              <BarChart data={csatData} layout="vertical" margin={{ left: 10 }}>
-                <XAxis type="number" hide />
-                <YAxis
-                  type="category"
-                  dataKey="name"
-                  hide
-                  tickLine={false}
-                  axisLine={false}
-                />
-                <Tooltip
-                  cursor={{ fill: 'transparent' }}
-                  content={<ChartTooltipContent hideLabel />}
-                />
-                <Bar
-                  dataKey="value"
-                  stackId="a"
-                  radius={[5, 5, 5, 5]}
-                  barSize={20}
-                />
-              </BarChart>
-            </ResponsiveContainer>
+            <ChartContainer config={csatConfig} className="h-32 w-full">
+              <ResponsiveContainer width="100%" height={120}>
+                <BarChart data={csatData} layout="vertical" margin={{ left: 10 }}>
+                  <XAxis type="number" hide />
+                  <YAxis
+                    type="category"
+                    dataKey="name"
+                    hide
+                    tickLine={false}
+                    axisLine={false}
+                  />
+                  <Tooltip
+                    cursor={{ fill: 'transparent' }}
+                    content={<ChartTooltipContent hideLabel />}
+                  />
+                  <Bar
+                    dataKey="value"
+                    stackId="a"
+                    radius={[5, 5, 5, 5]}
+                    barSize={20}
+                  />
+                </BarChart>
+              </ResponsiveContainer>
+             </ChartContainer>
             <div className="flex w-full justify-around text-xs">
               {csatData.map((item) => (
                 <div key={item.name} className="flex items-center gap-1.5">
