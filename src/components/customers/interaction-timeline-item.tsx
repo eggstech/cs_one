@@ -3,7 +3,7 @@
 import { Interaction } from "@/lib/types";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../ui/card";
-import { Phone, MessageSquare, StickyNote, Ticket, Clock, PhoneOff, RefreshCw, Sparkles, Loader2 } from "lucide-react";
+import { Phone, MessageSquare, StickyNote, Ticket, Clock, PhoneOff, Sparkles, Loader2 } from "lucide-react";
 import { format, formatDistanceToNow } from 'date-fns';
 import { CallSummarization } from "./call-summarization";
 import { useState, useEffect } from "react";

@@ -73,7 +73,7 @@ export function LogInteractionForm({ onAddInteraction, ticketId }: LogInteractio
             channel: 'Phone',
             content: callDetails.purpose,
             ...callDetails,
-            duration: callDetails.startTime && callDetails.endTime ? `${(new Date(callDetails.endTime).getTime() - new Date(callDetails.startTime).getTime()) / 1000 / 60}m` : undefined,
+            duration: callDetails.startTime && callDetails.endTime ? `${Math.round((new Date(callDetails.endTime).getTime() - new Date(callDetails.startTime).getTime()) / 1000 / 60)}m` : undefined,
             ticketId,
         };
     } else {
@@ -189,4 +189,3 @@ export function LogInteractionForm({ onAddInteraction, ticketId }: LogInteractio
     </Card>
   );
 }
-

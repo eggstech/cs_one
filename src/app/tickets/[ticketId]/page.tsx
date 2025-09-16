@@ -34,6 +34,7 @@ export default function TicketDetailPage({ params: { ticketId } }: { params: { t
   const isCallActive = searchParams.get('call') === 'true';
 
   const [ticket, setTicket] = useState<Ticket | undefined>(undefined);
+  const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
     const foundTicket = getTicket(ticketId);
@@ -56,13 +57,18 @@ export default function TicketDetailPage({ params: { ticketId } }: { params: { t
     } else {
         notFound();
     }
+    setHydrated(true);
   }, [ticketId, isCallActive]);
   
   const customer = ticket ? getCustomer(ticket.customerId) : undefined;
   const agents = allAgents;
   
-  if (!ticket) {
+  if (!hydrated) {
     return <div className="flex-1 space-y-4 p-8 pt-6">Loading ticket details...</div>;
+  }
+  
+  if (!ticket) {
+    return notFound();
   }
 
   const handleStatusChange = (status: Ticket['status']) => {
@@ -156,12 +162,12 @@ export default function TicketDetailPage({ params: { ticketId } }: { params: { t
                <Separator />
                <div className="flex justify-between">
                 <span className="text-muted-foreground">Created</span>
-                <span className="font-medium">{format(new Date(ticket.createdAt), "PPpp")}</span>
+                <span className="font-medium">{hydrated && format(new Date(ticket.createdAt), "PPpp")}</span>
               </div>
                <Separator />
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Last Update</span>
-                <span className="font-medium">{format(new Date(ticket.updatedAt), "PPpp")}</span>
+                <span className="font-medium">{hydrated && format(new Date(ticket.updatedAt), "PPpp")}</span>
               </div>
             </CardContent>
           </Card>
