@@ -57,7 +57,7 @@ export function InteractionTimelineItem({ interaction }: InteractionTimelineItem
     'bg-purple-500/20 text-purple-400';
 
   const isCall = interaction.type === 'Call';
-  const content = isCall ? interaction.purpose || interaction.content : interaction.content;
+  const content = interaction.content;
 
   const ticketStatusVariant = 
     ticket?.status === 'New' ? 'default' :
@@ -93,8 +93,8 @@ export function InteractionTimelineItem({ interaction }: InteractionTimelineItem
             <CardDescription className="text-xs">{interaction.type} via {interaction.channel}</CardDescription>
           </CardHeader>
           <CardContent className="p-4 pt-0 space-y-4">
-            <p className="text-sm">{content}</p>
-            {isCall && <CallSummarization interaction={interaction} />}
+            <p className="font-semibold text-sm">{content}</p>
+            {(isCall || interaction.discussion) ? <CallSummarization interaction={interaction} /> : <p className="text-sm text-muted-foreground">No additional details provided.</p>}
           </CardContent>
             <CardFooter className="p-4 pt-0 flex items-center justify-end gap-4 text-xs text-muted-foreground">
                <div className="w-full flex justify-end">

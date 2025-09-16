@@ -37,8 +37,6 @@ export type Interaction = {
   events?: CallEvent[]; // for call history
   
   // Detailed call fields
-  startTime?: string;
-  endTime?: string;
   purpose?: string;
   discussion?: string;
   output?: string;

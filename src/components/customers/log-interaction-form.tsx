@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState, useEffect } from "react";
@@ -59,26 +60,29 @@ Customer: No, that's all.
 Agent: Alright. Have a great day, Mr. Doe.
 `;
 
+const initialInteractionDetails = {
+    purpose: '',
+    discussion: '',
+    output: '',
+    nextAction: '',
+};
+
 export function LogInteractionForm({ onAddInteraction, ticketId, isCallActive: initialIsCallActive = false }: LogInteractionFormProps) {
   const { toast } = useToast();
   
   const [interactionChannel, setInteractionChannel] = useState<InteractionChannel>('Note');
-  const [interactionContent, setInteractionContent] = useState("");
+  const [interactionDetails, setInteractionDetails] = useState(initialInteractionDetails);
+  
   const [isCallLive, setIsCallLive] = useState(initialIsCallActive);
   const [isCallCompleted, setIsCallCompleted] = useState(false);
   const [callDuration, setCallDuration] = useState(0);
-   const [callDetails, setCallDetails] = useState({
-      purpose: '',
-      discussion: '',
-      output: '',
-      nextAction: '',
-  });
 
   useEffect(() => {
     setIsCallLive(initialIsCallActive);
     setIsCallCompleted(false); // Reset on prop change
     if(initialIsCallActive) {
       setCallDuration(0);
+      setInteractionDetails(initialInteractionDetails); // Reset details for a new call
     }
   }, [initialIsCallActive]);
   
@@ -100,22 +104,24 @@ export function LogInteractionForm({ onAddInteraction, ticketId, isCallActive: i
       return time;
   };
   
-  const handleLogSimpleInteraction = () => {
-    if (interactionContent.trim() === "") {
-        toast({ variant: "destructive", title: "Cannot add empty interaction", description: "Please enter some content."});
+  const handleLogInteraction = () => {
+    const { purpose } = interactionDetails;
+    if (purpose.trim() === "") {
+        toast({ variant: "destructive", title: "Cannot add interaction", description: "Please provide a purpose or subject."});
         return;
     }
     
     const interactionData: Omit<Interaction, 'id' | 'date' | 'agent'> = {
         type: interactionChannel === 'Note' ? 'Note' : 'Chat',
         channel: interactionChannel,
-        content: interactionContent,
+        content: purpose,
+        ...interactionDetails,
         ticketId,
     };
     
     onAddInteraction(interactionData);
     
-    setInteractionContent("");
+    setInteractionDetails(initialInteractionDetails);
     setInteractionChannel('Note');
   };
   
@@ -126,7 +132,7 @@ export function LogInteractionForm({ onAddInteraction, ticketId, isCallActive: i
   const handleLogCallInteraction = () => {
     const durationStr = formatDuration(callDuration);
     
-    const finalContent = callDetails.purpose || `Call ended after ${durationStr}`;
+    const finalContent = interactionDetails.purpose || `Call ended after ${durationStr}`;
     
     const interactionData: Omit<Interaction, 'id' | 'date' | 'agent'> = {
         type: 'Call',
@@ -134,10 +140,7 @@ export function LogInteractionForm({ onAddInteraction, ticketId, isCallActive: i
         content: finalContent,
         duration: durationStr,
         transcript: mockTranscript,
-        purpose: callDetails.purpose,
-        discussion: callDetails.discussion,
-        output: callDetails.output,
-        nextAction: callDetails.nextAction,
+        ...interactionDetails,
         ticketId,
     };
     
@@ -146,13 +149,37 @@ export function LogInteractionForm({ onAddInteraction, ticketId, isCallActive: i
     // Reset state to show the normal form again
     setIsCallCompleted(true);
     setCallDuration(0);
-    setCallDetails({ purpose: '', discussion: '', output: '', nextAction: '' });
-    setInteractionContent("");
+    setInteractionDetails(initialInteractionDetails);
     setInteractionChannel('Note');
     
     // We can't change the prop, so we manage this with internal state.
     // The component will now render the default form.
   }
+  
+  const handleDetailChange = (field: keyof typeof interactionDetails, value: string) => {
+      setInteractionDetails(prev => ({...prev, [field]: value}))
+  }
+
+  const sharedFormFields = (
+       <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="interaction-purpose">Purpose / Subject</Label>
+              <Input id="interaction-purpose" placeholder="e.g., Follow up on recent order" value={interactionDetails.purpose} onChange={e => handleDetailChange('purpose', e.target.value)} />
+            </div>
+            <div className="space-y-2">
+                <Label htmlFor="interaction-discussion">Discussion Summary</Label>
+                <Textarea id="interaction-discussion" placeholder="Summarize the key points of the conversation..." value={interactionDetails.discussion} onChange={e => handleDetailChange('discussion', e.target.value)} />
+            </div>
+            <div className="space-y-2">
+                <Label htmlFor="interaction-output">Output / Resolution</Label>
+                <Input id="interaction-output" placeholder="e.g., Customer agreed to exchange, sent return label" value={interactionDetails.output} onChange={e => handleDetailChange('output', e.target.value)} />
+            </div>
+            <div className="space-y-2">
+                <Label htmlFor="interaction-next-action">Next Action</Label>
+                <Input id="interaction-next-action" placeholder="e.g., Follow up in 3 days to check shipping status" value={interactionDetails.nextAction} onChange={e => handleDetailChange('nextAction', e.target.value)} />
+            </div>
+        </div>
+  )
 
   if (initialIsCallActive && !isCallCompleted) {
     return (
@@ -182,22 +209,7 @@ export function LogInteractionForm({ onAddInteraction, ticketId, isCallActive: i
                 </div>
             </CardHeader>
             <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="call-purpose">Purpose</Label>
-                  <Input id="call-purpose" placeholder="e.g., Follow up on recent order" value={callDetails.purpose} onChange={e => setCallDetails({...callDetails, purpose: e.target.value})} />
-                </div>
-                <div className="space-y-2">
-                    <Label htmlFor="call-discussion">Discussion Summary</Label>
-                    <Textarea id="call-discussion" placeholder="Summarize the key points of the conversation..." value={callDetails.discussion} onChange={e => setCallDetails({...callDetails, discussion: e.target.value})} />
-                </div>
-                <div className="space-y-2">
-                    <Label htmlFor="call-output">Output / Resolution</Label>
-                    <Input id="call-output" placeholder="e.g., Customer agreed to exchange, sent return label" value={callDetails.output} onChange={e => setCallDetails({...callDetails, output: e.target.value})} />
-                </div>
-                <div className="space-y-2">
-                    <Label htmlFor="call-next-action">Next Action</Label>
-                    <Input id="call-next-action" placeholder="e.g., Follow up in 3 days to check shipping status" value={callDetails.nextAction} onChange={e => setCallDetails({...callDetails, nextAction: e.target.value})} />
-                </div>
+                {sharedFormFields}
                  {!isCallLive && (
                     <div className="space-y-2">
                         <Label>Transcript</Label>
@@ -239,24 +251,10 @@ export function LogInteractionForm({ onAddInteraction, ticketId, isCallActive: i
                     </SelectContent>
                 </Select>
             </div>
-            <div className="space-y-4">
-              <Label htmlFor="new-interaction-content" className="text-sm font-medium">
-                  {interactionChannel === 'Note' ? 'Internal Note' : `${interactionChannel} Message`}
-              </Label>
-              <Textarea
-                id="new-interaction-content"
-                placeholder={
-                    interactionChannel === 'Note' ? "Add an internal note for your team..." :
-                    `Type your ${interactionChannel} message here...`
-                }
-                value={interactionContent}
-                onChange={(e) => setInteractionContent(e.target.value)}
-                className="min-h-24"
-              />
-          </div>
+            {sharedFormFields}
         </CardContent>
         <CardFooter className="justify-end">
-            <Button onClick={handleLogSimpleInteraction}>
+            <Button onClick={handleLogInteraction}>
                 <Send className="mr-2 h-4 w-4" />
                 Add Interaction
             </Button>
