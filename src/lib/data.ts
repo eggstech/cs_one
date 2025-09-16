@@ -7,7 +7,7 @@ export const agents = [
 ];
 
 export let tickets: Ticket[] = [];
-export const getTicket = (id: string) => tickets.find(t => t.id === id);
+export const getTicket = (id: string): Ticket | undefined => tickets.find(t => t.id === id);
 
 
 const interactions: Interaction[] = [
@@ -173,104 +173,55 @@ const interactions: Interaction[] = [
     date: '2024-07-26T12:00:00Z',
     agent: agents[1],
     content: 'Missed call from customer.'
+  },
+  {
+    id: 'int-18',
+    type: 'Chat',
+    channel: 'Zalo',
+    date: '2024-07-15T11:00:00Z',
+    agent: agents[1],
+    content: 'Customer inquired about store opening hours.',
+    ticketId: 'TKT-008'
+  },
+  {
+    id: 'int-19',
+    type: 'Note',
+    channel: 'System',
+    date: '2024-07-15T11:05:00Z',
+    agent: agents[1],
+    content: 'Provided store hours and location link.',
+    ticketId: 'TKT-008'
+  },
+  {
+    id: 'int-20',
+    type: 'Call',
+    callType: 'Incoming',
+    channel: 'Phone',
+    date: '2024-07-27T16:00:00Z',
+    duration: '7m 19s',
+    agent: agents[2],
+    recordingUrl: '#',
+    ticketId: 'TKT-009',
+    content: 'Call regarding a payment reminder for an overdue invoice.'
+  },
+   {
+    id: 'int-21',
+    type: 'Chat',
+    channel: 'Zalo',
+    date: '2024-07-28T10:00:00Z',
+    agent: agents[0],
+    content: 'Chào bạn, mình có thể giúp gì cho bạn?',
+    ticketId: 'TKT-010'
+  },
+  {
+    id: 'int-22',
+    type: 'Chat',
+    channel: 'Zalo',
+    date: '2024-07-28T10:01:00Z',
+    agent: agents[0],
+    content: 'Bạn có muốn biết thêm về sản phẩm của chúng tôi không?',
+    ticketId: 'TKT-010'
   }
-];
-
-export const customers: Customer[] = [
-  {
-    id: 'cus-1',
-    name: 'John Doe',
-    email: 'john.doe@example.com',
-    phone: '555-0101',
-    avatarUrl: 'https://picsum.photos/seed/1/100/100',
-    createdAt: '2024-01-15T09:00:00Z',
-    identities: [
-      { channel: 'Phone', identifier: '555-0101' },
-      { channel: 'Email', identifier: 'john.doe@example.com' },
-      { channel: 'Facebook', identifier: 'johndoe' },
-    ],
-    interactions: interactions.filter(i => ['cus-1', undefined].includes(getTicket(i.ticketId || '')?.customerId) || !i.ticketId).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
-    orders: [
-      {
-        id: 'ORD-001',
-        date: '2024-07-20T11:00:00Z',
-        status: 'Shipped',
-        total: 125.50,
-        items: [{ id: 'item-a', name: 'Stylish Frames', quantity: 1, price: 125.50 }]
-      },
-      {
-        id: 'ORD-000',
-        date: '2024-01-20T11:00:00Z',
-        status: 'Delivered',
-        total: 99.00,
-        items: [{ id: 'item-c', name: 'Reading Glasses', quantity: 1, price: 99.00 }]
-      },
-    ],
-    eyeMeasurement: {
-      od: { sph: '-1.25', cyl: '-0.50', ax: '180' },
-      os: { sph: '-1.50', cyl: '-0.50', ax: '175' },
-      pd: '63',
-    },
-    tags: ['VIP', 'Repeat Customer'],
-    membership: {
-      level: 'Gold',
-      points: 2500,
-      nextLevelPoints: 5000,
-    },
-    debt: {
-        current: 50.25,
-        history: [
-            { date: '2024-07-01T10:00:00Z', amount: 100.00, reason: 'Initial Debt' },
-            { date: '2024-07-15T12:00:00Z', amount: -49.75, reason: 'Partial Payment' }
-        ]
-    }
-  },
-  {
-    id: 'cus-2',
-    name: 'Jane Smith',
-    email: 'jane.smith@example.com',
-    phone: '555-0102',
-    avatarUrl: 'https://picsum.photos/seed/2/100/100',
-    createdAt: '2024-03-22T11:30:00Z',
-    identities: [
-      { channel: 'Phone', identifier: '555-0102' },
-      { channel: 'Zalo', identifier: 'janesmith.zalo' },
-    ],
-    interactions: interactions.filter(i => ['cus-2', undefined].includes(getTicket(i.ticketId || '')?.customerId) || !i.ticketId).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
-    orders: [
-       {
-        id: 'ORD-002',
-        date: '2024-07-18T18:45:00Z',
-        status: 'Delivered',
-        total: 250.00,
-        items: [{ id: 'item-b', name: 'Premium Lenses', quantity: 2, price: 125.00 }]
-      },
-    ],
-    tags: ['New Customer'],
-    membership: {
-        level: 'Bronze',
-        points: 50,
-        nextLevelPoints: 500
-    },
-    debt: {
-        current: 0,
-        history: []
-    }
-  },
-  {
-    id: 'cus-3',
-    name: 'Unrecognized Caller',
-    email: 'unknown@example.com',
-    phone: '555-0199',
-    avatarUrl: 'https://picsum.photos/seed/99/100/100',
-    createdAt: 'N/A',
-    identities: [
-      { channel: 'Phone', identifier: '555-0199' },
-    ],
-    interactions: [],
-    orders: [],
-    tags: [],
-  },
 ];
 
 const allTickets: Ticket[] = [
@@ -357,6 +308,42 @@ const allTickets: Ticket[] = [
     createdAt: '2024-07-26T10:00:00Z',
     updatedAt: '2024-07-26T10:00:00Z',
     interactions: interactions.filter(i => i.ticketId === 'TKT-007').sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
+  },
+   {
+    id: 'TKT-008',
+    customerId: 'cus-3',
+    customerName: 'Emily Brown',
+    customerAvatarUrl: 'https://picsum.photos/seed/3/40/40',
+    subject: 'Store hours inquiry',
+    status: 'Resolved',
+    agent: agents[1],
+    createdAt: '2024-07-15T11:00:00Z',
+    updatedAt: '2024-07-15T11:05:00Z',
+    interactions: interactions.filter(i => i.ticketId === 'TKT-008'),
+  },
+  {
+    id: 'TKT-009',
+    customerId: 'cus-5',
+    customerName: 'David Wilson',
+    customerAvatarUrl: 'https://picsum.photos/seed/5/40/40',
+    subject: 'Overdue payment reminder',
+    status: 'In-Progress',
+    agent: agents[2],
+    createdAt: '2024-07-27T16:00:00Z',
+    updatedAt: '2024-07-27T16:07:19Z',
+    interactions: interactions.filter(i => i.ticketId === 'TKT-009'),
+  },
+  {
+    id: 'TKT-010',
+    customerId: 'cus-4',
+    customerName: 'Michael Chen',
+    customerAvatarUrl: 'https://picsum.photos/seed/4/40/40',
+    subject: 'Zalo chat inquiry',
+    status: 'New',
+    agent: agents[0],
+    createdAt: '2024-07-28T10:00:00Z',
+    updatedAt: '2024-07-28T10:01:00Z',
+    interactions: interactions.filter(i => i.ticketId === 'TKT-010'),
   }
 ];
 
@@ -364,8 +351,206 @@ tickets.push(...allTickets);
 tickets.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
 
 
-export const getCustomer = (id: string) => customers.find(c => c.id === id);
-export const getTicketsForCustomer = (customerId: string) => tickets.filter(t => t.customerId === customerId);
+export let customers: Customer[] = [
+  {
+    id: 'cus-1',
+    name: 'John Doe',
+    email: 'john.doe@example.com',
+    phone: '555-0101',
+    avatarUrl: 'https://picsum.photos/seed/1/100/100',
+    createdAt: '2024-01-15T09:00:00Z',
+    identities: [
+      { channel: 'Phone', identifier: '555-0101' },
+      { channel: 'Email', identifier: 'john.doe@example.com' },
+      { channel: 'Facebook', identifier: 'johndoe' },
+    ],
+    interactions: [], // This will be populated later
+    orders: [
+      {
+        id: 'ORD-001',
+        date: '2024-07-20T11:00:00Z',
+        status: 'Shipped',
+        total: 125.50,
+        items: [{ id: 'item-a', name: 'Stylish Frames', quantity: 1, price: 125.50 }]
+      },
+      {
+        id: 'ORD-000',
+        date: '2024-01-20T11:00:00Z',
+        status: 'Delivered',
+        total: 99.00,
+        items: [{ id: 'item-c', name: 'Reading Glasses', quantity: 1, price: 99.00 }]
+      },
+    ],
+    eyeMeasurement: {
+      od: { sph: '-1.25', cyl: '-0.50', ax: '180' },
+      os: { sph: '-1.50', cyl: '-0.50', ax: '175' },
+      pd: '63',
+    },
+    tags: ['VIP', 'Repeat Customer'],
+    membership: {
+      level: 'Gold',
+      points: 2500,
+      nextLevelPoints: 5000,
+    },
+    debt: {
+        current: 50.25,
+        history: [
+            { date: '2024-07-01T10:00:00Z', amount: 100.00, reason: 'Initial Debt' },
+            { date: '2024-07-15T12:00:00Z', amount: -49.75, reason: 'Partial Payment' }
+        ]
+    }
+  },
+  {
+    id: 'cus-2',
+    name: 'Jane Smith',
+    email: 'jane.smith@example.com',
+    phone: '555-0102',
+    avatarUrl: 'https://picsum.photos/seed/2/100/100',
+    createdAt: '2024-03-22T11:30:00Z',
+    identities: [
+      { channel: 'Phone', identifier: '555-0102' },
+      { channel: 'Zalo', identifier: 'janesmith.zalo' },
+    ],
+    interactions: [],
+    orders: [
+       {
+        id: 'ORD-002',
+        date: '2024-07-18T18:45:00Z',
+        status: 'Delivered',
+        total: 250.00,
+        items: [{ id: 'item-b', name: 'Premium Lenses', quantity: 2, price: 125.00 }]
+      },
+    ],
+    tags: ['New Customer'],
+    membership: {
+        level: 'Bronze',
+        points: 50,
+        nextLevelPoints: 500
+    },
+    debt: {
+        current: 0,
+        history: []
+    }
+  },
+  {
+    id: 'cus-3',
+    name: 'Emily Brown',
+    email: 'emily.brown@example.com',
+    phone: '555-0103',
+    avatarUrl: 'https://picsum.photos/seed/3/100/100',
+    createdAt: '2024-05-10T14:00:00Z',
+    identities: [
+      { channel: 'Phone', identifier: '555-0103' },
+      { channel: 'Email', identifier: 'emily.brown@example.com' },
+    ],
+    interactions: [],
+    orders: [],
+    tags: ['Frequent Inquirer'],
+    membership: {
+      level: 'Silver',
+      points: 750,
+      nextLevelPoints: 2000,
+    },
+    debt: {
+        current: 0,
+        history: []
+    }
+  },
+  {
+    id: 'cus-4',
+    name: 'Michael Chen',
+    email: 'michael.chen@example.com',
+    phone: '555-0104',
+    avatarUrl: 'https://picsum.photos/seed/4/100/100',
+    createdAt: '2023-11-01T18:00:00Z',
+    identities: [
+      { channel: 'Phone', identifier: '555-0104' },
+      { channel: 'Zalo', identifier: 'michaelchen.zalo' },
+    ],
+    interactions: [],
+    orders: [
+      {
+        id: 'ORD-004',
+        date: '2023-11-05T10:00:00Z',
+        status: 'Delivered',
+        total: 75.00,
+        items: [{ id: 'item-d', name: 'Lens Cleaning Kit', quantity: 1, price: 75.00 }]
+      },
+    ],
+    tags: [],
+  },
+  {
+    id: 'cus-5',
+    name: 'David Wilson',
+    email: 'david.wilson@example.com',
+    phone: '555-0105',
+    avatarUrl: 'https://picsum.photos/seed/5/100/100',
+    createdAt: '2024-06-20T09:30:00Z',
+    identities: [
+      { channel: 'Phone', identifier: '555-0105' },
+    ],
+    interactions: [],
+    orders: [
+       {
+        id: 'ORD-005',
+        date: '2024-06-20T10:00:00Z',
+        status: 'Pending',
+        total: 150.00,
+        items: [{ id: 'item-e', name: 'Designer Frames', quantity: 1, price: 150.00 }]
+      }
+    ],
+    tags: ['Account Overdue'],
+    debt: {
+      current: 150.00,
+      history: [
+        { date: '2024-06-20T10:00:00Z', amount: 150.00, reason: 'Order ORD-005' },
+      ]
+    }
+  },
+  {
+    id: 'cus-99',
+    name: 'Unrecognized Caller',
+    email: 'unknown@example.com',
+    phone: '555-0199',
+    avatarUrl: 'https://picsum.photos/seed/99/100/100',
+    createdAt: 'N/A',
+    identities: [
+      { channel: 'Phone', identifier: '555-0199' },
+    ],
+    interactions: [],
+    orders: [],
+    tags: [],
+  },
+];
+
+
+// Assign interactions to customers
+customers.forEach(customer => {
+  const customerTickets = allTickets.filter(t => t.customerId === customer.id);
+  const customerTicketIds = customerTickets.map(t => t.id);
+  // Get all interactions for this customer's tickets, plus any interactions without a ticket
+  const customerInteractions = interactions.filter(i => 
+    (i.ticketId && customerTicketIds.includes(i.ticketId))
+  );
+  customer.interactions = customerInteractions.sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+});
+
+// A customer's interactions should also include non-ticketed interactions associated with them.
+// A simple way is to assign non-ticketed interactions to a customer.
+// For this mock data, let's assign some generic interactions to customers.
+const nonTicketedInteractions = interactions.filter(i => !i.ticketId);
+if (customers[0]) {
+    customers[0].interactions.push(...nonTicketedInteractions.filter(i => i.id === 'int-6' || i.id === 'int-17'));
+}
+if (customers[1]) {
+    customers[1].interactions.push(...nonTicketedInteractions.filter(i => i.id === 'int-7'));
+}
+
+// Re-sort after adding more
+customers.forEach(c => c.interactions.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
+
+export const getCustomer = (id: string): Customer | undefined => customers.find(c => c.id === id);
+export const getTicketsForCustomer = (customerId: string): Ticket[] => allTickets.filter(t => t.customerId === customerId);
 
 export const allOrders: Order[] = customers.flatMap(c => c.orders);
 export const allProducts: string[] = [...new Set(customers.flatMap(c => c.orders).flatMap(o => o.items).map(i => i.name))];
