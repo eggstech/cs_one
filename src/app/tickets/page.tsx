@@ -1,6 +1,7 @@
+
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Card,
   CardContent,
@@ -37,6 +38,11 @@ export default function TicketsPage() {
   const [tickets, setTickets] = useState<Ticket[]>(allTickets);
   const [statusFilters, setStatusFilters] = useState<Ticket['status'][]>(['New', 'In-Progress']);
   const [isMergeDialogOpen, setIsMergeDialogOpen] = useState(false);
+  const [hydrated, setHydrated] = useState(false);
+
+  useEffect(() => {
+    setHydrated(true);
+  }, []);
 
   const handleFilterChange = (status: Ticket['status'], checked: boolean) => {
     setStatusFilters(prev => {
@@ -152,8 +158,8 @@ export default function TicketsPage() {
                       <span>{ticket.agent.name}</span>
                     </div>
                   </TableCell>
-                  <TableCell>{format(new Date(ticket.createdAt), 'PP')}</TableCell>
-                  <TableCell>{format(new Date(ticket.updatedAt), 'PP')}</TableCell>
+                  <TableCell>{hydrated ? format(new Date(ticket.createdAt), 'PP') : ''}</TableCell>
+                  <TableCell>{hydrated ? format(new Date(ticket.updatedAt), 'PP') : ''}</TableCell>
                 </TableRow>
               ))}
             </TableBody>

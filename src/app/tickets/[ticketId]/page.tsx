@@ -87,8 +87,6 @@ export default function TicketDetailPage({ params: { ticketId } }: { params: { t
         ],
       };
       setTicket(newTicket);
-    } else {
-        notFound();
     }
     setHydrated(true);
   }, [ticketId, isCallActive, searchParams]);
@@ -96,6 +94,18 @@ export default function TicketDetailPage({ params: { ticketId } }: { params: { t
   const customer = ticket ? getCustomer(ticket.customerId) : undefined;
   const agents = allAgents;
   
+  useEffect(() => {
+    if (!ticket) {
+      const foundTicket = getTicket(ticketId);
+      if (!foundTicket) {
+        notFound();
+      }
+      setTicket(foundTicket);
+    }
+    setHydrated(true);
+  }, [ticketId, ticket]);
+
+
   if (!hydrated) {
     return <div className="flex-1 space-y-4 p-8 pt-6">Loading ticket details...</div>;
   }
@@ -185,12 +195,12 @@ export default function TicketDetailPage({ params: { ticketId } }: { params: { t
                <Separator />
                <div className="flex justify-between">
                 <span className="text-muted-foreground">Created</span>
-                <span className="font-medium">{hydrated && format(new Date(ticket.createdAt), "PPpp")}</span>
+                <span className="font-medium">{hydrated ? format(new Date(ticket.createdAt), "PPpp") : ""}</span>
               </div>
                <Separator />
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Last Update</span>
-                <span className="font-medium">{hydrated && format(new Date(ticket.updatedAt), "PPpp")}</span>
+                <span className="font-medium">{hydrated ? format(new Date(ticket.updatedAt), "PPpp") : ""}</span>
               </div>
             </CardContent>
           </Card>
@@ -220,5 +230,3 @@ export default function TicketDetailPage({ params: { ticketId } }: { params: { t
     </div>
   );
 }
-
-    

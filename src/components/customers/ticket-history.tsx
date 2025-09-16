@@ -70,7 +70,7 @@ export function TicketHistory({ tickets }: TicketHistoryProps) {
                   </Badge>
                 </TableCell>
                 <TableCell className="text-right">
-                    {hydrated && formatDistanceToNow(new Date(ticket.updatedAt), { addSuffix: true })}
+                    {hydrated ? formatDistanceToNow(new Date(ticket.updatedAt), { addSuffix: true }) : ''}
                 </TableCell>
               </TableRow>
             )) : (

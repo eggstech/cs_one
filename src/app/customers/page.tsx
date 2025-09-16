@@ -1,5 +1,6 @@
+
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Card,
   CardContent,
@@ -45,6 +46,11 @@ export default function CustomersPage() {
     membershipLevel: true,
     tags: false,
   });
+  const [hydrated, setHydrated] = useState(false);
+
+  useEffect(() => {
+    setHydrated(true);
+  }, []);
 
   const columnNames: { id: keyof ColumnVisibility; label: string }[] = [
       { id: 'name', label: 'Customer' },
@@ -136,7 +142,7 @@ export default function CustomersPage() {
                   )}
                   {columnVisibility.email && <TableCell>{customer.email}</TableCell>}
                   {columnVisibility.phone && <TableCell>{customer.phone}</TableCell>}
-                  {columnVisibility.createdAt && <TableCell>{format(new Date(customer.createdAt), 'PP')}</TableCell>}
+                  {columnVisibility.createdAt && <TableCell>{hydrated ? format(new Date(customer.createdAt), 'PP') : ''}</TableCell>}
                   {columnVisibility.totalOrders && <TableCell className="text-center">{customer.orders.length}</TableCell>}
                   {columnVisibility.membershipLevel && (
                     <TableCell>
