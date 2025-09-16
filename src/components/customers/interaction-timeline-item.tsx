@@ -5,13 +5,13 @@ import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../ui/card";
 import { Phone, MessageSquare, StickyNote, Ticket, Clock, PhoneOff, Sparkles, Loader2 } from "lucide-react";
 import { format, formatDistanceToNow } from 'date-fns';
-import { CallSummarization } from "./call-summarization";
 import { useState, useEffect } from "react";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { Label } from "../ui/label";
 import { Textarea } from "../ui/textarea";
 import { summarizeCall, SummarizeCallOutput } from "@/ai/flows/summarize-call";
+import { Input } from "../ui/input";
 
 interface InteractionTimelineItemProps {
   interaction: Interaction;
@@ -45,33 +45,41 @@ const getIcon = (type: Interaction['type']) => {
 };
 
 export function InteractionTimelineItem({ interaction, onCallEnd }: InteractionTimelineItemProps) {
-  const [callStatus, setCallStatus] = useState<'calling' | 'ended'>(interaction.isLive ? 'calling' : 'ended');
   const [callDuration, setCallDuration] = useState(0);
   const [isSummarizing, setIsSummarizing] = useState(false);
   const [summary, setSummary] = useState<SummarizeCallOutput | null>(null);
   const [hydrated, setHydrated] = useState(false);
+  const [callDetails, setCallDetails] = useState({
+      purpose: interaction.purpose || '',
+      discussion: interaction.discussion || '',
+      output: interaction.output || '',
+      nextAction: interaction.nextAction || '',
+  });
 
   useEffect(() => {
     setHydrated(true);
     let timer: NodeJS.Timeout;
-    if (callStatus === 'calling' && interaction.isLive) {
+    if (interaction.isLive) {
       timer = setInterval(() => {
         setCallDuration(prev => prev + 1);
       }, 1000);
     }
     return () => clearInterval(timer);
-  }, [callStatus, interaction.isLive]);
+  }, [interaction.isLive]);
 
   const handleEndCall = () => {
-    setCallStatus('ended');
     if (onCallEnd) {
       const durationStr = formatDuration(callDuration);
       onCallEnd({
         ...interaction,
         isLive: false,
         duration: durationStr,
-        content: interaction.content + ` (Call duration: ${durationStr})`,
+        content: callDetails.purpose || `Call (duration: ${durationStr})`,
         transcript: mockTranscript,
+        purpose: callDetails.purpose,
+        discussion: callDetails.discussion,
+        output: callDetails.output,
+        nextAction: callDetails.nextAction,
       });
     }
   };
@@ -94,7 +102,7 @@ export function InteractionTimelineItem({ interaction, onCallEnd }: InteractionT
       const date = new Date(0);
       date.setSeconds(seconds);
       const time = date.toISOString().substr(14, 5);
-      return time === '00:00' ? '' : time;
+      return time === '00:00' && seconds > 0 ? '0m 0s' : time;
   };
 
   const iconBgColor = 
@@ -134,22 +142,43 @@ export function InteractionTimelineItem({ interaction, onCallEnd }: InteractionT
             <CardDescription className="text-xs">{interaction.type} via {interaction.channel}</CardDescription>
           </CardHeader>
           <CardContent className="p-4 pt-0">
-            {isCall && interaction.isLive && (
-                <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-2">
-                        <Badge variant={'default'}>
-                            <Phone className="mr-2 h-4 w-4 animate-pulse"/>
-                            Calling
-                        </Badge>
-                        <span className="text-sm text-muted-foreground font-mono">{formatDuration(callDuration)}</span>
+             {isCall && interaction.isLive && (
+                <div className="mb-4 space-y-4">
+                    <div className="flex items-center justify-between p-3 border rounded-lg bg-muted">
+                        <div className="flex items-center gap-2">
+                            <Badge variant={'default'}>
+                                <Phone className="mr-2 h-4 w-4 animate-pulse"/>
+                                Calling
+                            </Badge>
+                            <span className="text-sm text-muted-foreground font-mono">{formatDuration(callDuration)}</span>
+                        </div>
+                        <Button variant="destructive" size="sm" onClick={handleEndCall}>
+                            <PhoneOff className="mr-2 h-4 w-4"/>
+                            End Call
+                        </Button>
                     </div>
-                    <Button variant="destructive" size="sm" onClick={handleEndCall}>
-                        <PhoneOff className="mr-2 h-4 w-4"/>
-                        End Call
-                    </Button>
+                    <div className="space-y-2">
+                      <Label htmlFor="call-purpose">Purpose</Label>
+                      <Input id="call-purpose" placeholder="e.g., Follow up on recent order" value={callDetails.purpose} onChange={e => setCallDetails({...callDetails, purpose: e.target.value})} />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="call-discussion">Discussion Summary</Label>
+                        <Textarea id="call-discussion" placeholder="Summarize the key points of the conversation..." value={callDetails.discussion} onChange={e => setCallDetails({...callDetails, discussion: e.target.value})} />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="call-output">Output / Resolution</Label>
+                        <Input id="call-output" placeholder="e.g., Customer agreed to exchange, sent return label" value={callDetails.output} onChange={e => setCallDetails({...callDetails, output: e.target.value})} />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="call-next-action">Next Action</Label>
+                        <Input id="call-next-action" placeholder="e.g., Follow up in 3 days to check shipping status" value={callDetails.nextAction} onChange={e => setCallDetails({...callDetails, nextAction: e.target.value})} />
+                    </div>
                 </div>
             )}
-            <p className="text-sm">{interaction.content}</p>
+            
+            {!interaction.isLive && (
+                <p className="text-sm">{interaction.content}</p>
+            )}
 
             {isCall && !interaction.isLive && interaction.transcript && (
                  <div className="space-y-4 mt-4">
@@ -176,9 +205,9 @@ export function InteractionTimelineItem({ interaction, onCallEnd }: InteractionT
                 </div>
             )}
           </CardContent>
-          {isCall && !interaction.isLive && interaction.recordingUrl && (
-            <CardFooter className="p-4 pt-0">
-              <CallSummarization interaction={interaction} />
+          {isCall && !interaction.isLive && interaction.duration && (
+             <CardFooter className="p-4 pt-0 text-xs text-muted-foreground">
+                Call Duration: {interaction.duration}
             </CardFooter>
           )}
         </Card>

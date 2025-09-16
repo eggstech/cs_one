@@ -38,9 +38,27 @@ export default function CustomerProfilePage({ params }: { params: { customerId: 
 
   useEffect(() => {
     const fetchedCustomer = getCustomer(params.customerId);
-    setCustomer(fetchedCustomer);
+    if (fetchedCustomer) {
+      if (isCallActive && !fetchedCustomer.interactions.some(i => i.isLive)) {
+        const liveCallInteraction: Interaction = {
+          id: `int-live-${Date.now()}`,
+          type: 'Call',
+          channel: 'Phone',
+          date: new Date().toISOString(),
+          agent: agents[0], // Assume current agent
+          content: 'Incoming Call',
+          isLive: true,
+        };
+        setCustomer({
+          ...fetchedCustomer,
+          interactions: [liveCallInteraction, ...fetchedCustomer.interactions]
+        });
+      } else {
+        setCustomer(fetchedCustomer);
+      }
+    }
     setHydrated(true);
-  }, [params.customerId]);
+  }, [params.customerId, isCallActive]);
 
   if (!hydrated) {
     // Show a loading state or a skeleton screen while the customer is being fetched.
@@ -70,7 +88,7 @@ export default function CustomerProfilePage({ params }: { params: { customerId: 
     const newInteraction: Interaction = {
       id: `int-${Date.now()}`,
       date: new Date().toISOString(),
-      agent: agents[0], // Assuming current user is agent-1
+      agent: agents[0], // Assuming current user is agent-0
       ...interactionData,
     };
     
@@ -84,7 +102,7 @@ export default function CustomerProfilePage({ params }: { params: { customerId: 
   
   const handleEndCall = (callInteraction: Interaction) => {
       setCustomer(prevCustomer => {
-          if (!prevCustomer) return;
+          if (!prevCustomer) return undefined;
           const updatedInteractions = prevCustomer.interactions.map(i => i.id === callInteraction.id ? callInteraction : i);
           return { ...prevCustomer, interactions: updatedInteractions };
       });
@@ -199,7 +217,7 @@ export default function CustomerProfilePage({ params }: { params: { customerId: 
             </TabsList>
             
             <TabsContent value="timeline" className="space-y-6">
-              <LogInteractionForm onAddInteraction={handleAddInteraction} isCallActive={isCallActive} />
+              <LogInteractionForm onAddInteraction={handleAddInteraction} />
               <InteractionTimeline interactions={customer.interactions} onCallEnd={handleEndCall}/>
             </TabsContent>
             
