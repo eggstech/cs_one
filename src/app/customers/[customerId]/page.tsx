@@ -28,6 +28,7 @@ import { useToast } from "@/hooks/use-toast";
 import { EditCustomerProfileDialog } from "@/components/customers/edit-customer-profile-dialog";
 
 export default function CustomerProfilePage({ params }: { params: { customerId: string } }) {
+  const { customerId } = params;
   const { toast } = useToast();
   const searchParams = useSearchParams();
   const isCallActive = searchParams.get('call') === 'true';
@@ -37,12 +38,11 @@ export default function CustomerProfilePage({ params }: { params: { customerId: 
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   useEffect(() => {
-    const { customerId } = params;
     const fetchedCustomer = getCustomer(customerId);
     
     setCustomer(fetchedCustomer);
     setHydrated(true);
-  }, [params]);
+  }, [customerId]);
 
   if (!hydrated) {
     // Show a loading state or a skeleton screen while the customer is being fetched.
@@ -94,7 +94,7 @@ export default function CustomerProfilePage({ params }: { params: { customerId: 
     setIsEditDialogOpen(false);
   }
 
-  const customerTickets = getTicketsForCustomer(params.customerId);
+  const customerTickets = getTicketsForCustomer(customerId);
 
   const levelColors: { [key: string]: string } = {
     Bronze: "text-[#cd7f32]",
@@ -225,5 +225,3 @@ export default function CustomerProfilePage({ params }: { params: { customerId: 
     </>
   );
 }
-
-    
