@@ -22,6 +22,8 @@ import { Interaction, Customer } from '@/lib/types';
 import Link from 'next/link';
 import { format } from 'date-fns';
 import { CallDetailModal } from '@/components/call-history/call-detail-modal';
+import { Badge } from '@/components/ui/badge';
+import { Ticket } from 'lucide-react';
 
 interface CallLog extends Interaction {
     customer: Customer;
@@ -67,16 +69,19 @@ export default function CallHistoryPage() {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead>Call ID</TableHead>
                 <TableHead>Customer</TableHead>
                 <TableHead>Agent</TableHead>
                 <TableHead>Date</TableHead>
                 <TableHead>Duration</TableHead>
                 <TableHead>Content</TableHead>
+                <TableHead>Linked Ticket</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {callLogs.map((log) => (
                 <TableRow key={log.id} onClick={() => setSelectedLog(log)} className="cursor-pointer">
+                    <TableCell className="font-mono">{log.id}</TableCell>
                     <TableCell>
                         <Link href={`/customers/${log.customer.id}`} onClick={(e) => e.stopPropagation()}>
                         <div className="flex items-center gap-3">
@@ -105,6 +110,18 @@ export default function CallHistoryPage() {
                   <TableCell>{format(new Date(log.date), 'PPpp')}</TableCell>
                   <TableCell>{log.duration || '-'}</TableCell>
                   <TableCell>{log.content}</TableCell>
+                  <TableCell>
+                    {log.ticketId ? (
+                         <Link href={`/tickets/${log.ticketId}`} onClick={(e) => e.stopPropagation()}>
+                            <Badge variant="outline" className="hover:bg-accent">
+                                <Ticket className="mr-2 h-3 w-3" />
+                                {log.ticketId}
+                            </Badge>
+                        </Link>
+                    ) : (
+                        <span className="text-muted-foreground">-</span>
+                    )}
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>

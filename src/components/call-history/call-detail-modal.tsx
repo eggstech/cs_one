@@ -34,7 +34,7 @@ export function CallDetailModal({ interaction, open, onOpenChange }: CallDetailM
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
-          <DialogTitle>Call Details</DialogTitle>
+          <DialogTitle>Call Details ({interaction.id})</DialogTitle>
           <DialogDescription>
             A detailed record of the phone call interaction.
           </DialogDescription>
@@ -85,7 +85,7 @@ export function CallDetailModal({ interaction, open, onOpenChange }: CallDetailM
                 <div className="flex items-center gap-2">
                     <h4 className="font-semibold">Linked Ticket</h4>
                     <Link href={`/tickets/${interaction.ticketId}`}>
-                        <Badge>
+                        <Badge variant="outline" className="hover:bg-accent">
                             <Ticket className="mr-2 h-3 w-3" />
                             {interaction.ticketId}
                         </Badge>
@@ -99,4 +99,3 @@ export function CallDetailModal({ interaction, open, onOpenChange }: CallDetailM
     </Dialog>
   );
 }
-
