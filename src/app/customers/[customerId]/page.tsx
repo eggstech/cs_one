@@ -47,14 +47,6 @@ export default function CustomerProfilePage({ params }: { params: { customerId: 
     setHydrated(true);
   }, [params, isCallActive]);
 
-  const handleUpdateInteraction = (updatedInteraction: Interaction) => {
-    setCustomer(prev => {
-        if (!prev) return;
-        const newInteractions = prev.interactions.map(i => i.id === updatedInteraction.id ? updatedInteraction : i);
-        return { ...prev, interactions: newInteractions };
-    });
-  }
-
   if (!hydrated) {
     // Show a loading state or a skeleton screen while the customer is being fetched.
     return (
@@ -205,7 +197,7 @@ export default function CustomerProfilePage({ params }: { params: { customerId: 
             
             <TabsContent value="timeline" className="space-y-6">
               <LogInteractionForm onAddInteraction={handleAddInteraction} isCallActive={isCallActive} />
-              <InteractionTimeline interactions={customer.interactions} onUpdateInteraction={handleUpdateInteraction} />
+              <InteractionTimeline interactions={customer.interactions} />
             </TabsContent>
             
             <TabsContent value="tickets">

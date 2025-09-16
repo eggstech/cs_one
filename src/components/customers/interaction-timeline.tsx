@@ -11,10 +11,9 @@ import { InteractionTimelineItem } from "./interaction-timeline-item";
 
 interface InteractionTimelineProps {
   interactions: Interaction[];
-  onUpdateInteraction: (interaction: Interaction) => void;
 }
 
-export function InteractionTimeline({ interactions, onUpdateInteraction }: InteractionTimelineProps) {
+export function InteractionTimeline({ interactions }: InteractionTimelineProps) {
 
   return (
     <Card>
@@ -29,7 +28,6 @@ export function InteractionTimeline({ interactions, onUpdateInteraction }: Inter
                 <InteractionTimelineItem 
                   key={interaction.id} 
                   interaction={interaction}
-                  onUpdateInteraction={onUpdateInteraction}
                 />
             ))}
         </div>

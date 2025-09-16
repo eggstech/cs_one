@@ -6,12 +6,19 @@ import { summarizeCall, SummarizeCallOutput } from '@/ai/flows/summarize-call';
 import { useToast } from '@/hooks/use-toast';
 import { Interaction } from '@/lib/types';
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import { Textarea } from '../ui/textarea';
+import { ChevronDown } from 'lucide-react';
 
 interface CallSummarizationProps {
   interaction: Interaction;
 }
 
-const mockAudioDataUri = "data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4LjI5LjEwMAAAAAAAAAAAAAAA//tAwAAAAAAAAAAAAAAAAAAAAAAAABoR2tGYUdQTk9JREdJS1BNSk9KTEpJR1BNSkpJSUpFREdDRURDQ0VBRlVORVVNT1VORVZVT0dFR0VDRUNFUERDQ0VDRUVERUdFRUVER0dGRUVFR0VFRUVFR0dFRUZHSEdIR0hISUdJSElIR0hIR0hISElISEhGRUdGRUZFRkVERERDQ0RCREJDP/7QMQ PAFVmYQPAAEAAAAPAAAEgAAAAAund2R2d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d//sA4gAAAAAAAwAABpFraWtpampoaGdnZ2ZlZWVlZGRkZGNjY2NjY2JiYmFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFiY2NjY2RkZGRlZWVmZmdnZ2hoaGlpaWlqampqa2tsbW1ubm9wcHFyc3N0dXV2dnd4eXp7fH1+f4CBgoOEhYaHiImKi4yNjo+QkZKTlJWWl5iZmpucnZ6foKGio6SlpqeoqaqrrK2ur7CxsrO0tbW3uLm6u7y9vr/AwcLDxMXGx8jJysvMzc7P0NHS09TV1tfY2drb3N3e3+Dh4uPk5ebn6Onq6+zt7u/w8fLz9PX29/j5+vv8/f7/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/9k=";
+const mockAudioDataUri = "data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4LjI5LjEwMAAAAAAAAAAAAAAA//tAwAAAAAAAAAAAAAAAAAAAAAAAABoR2tGYUdQTk9JREdJS1BNSk9KTEpJR1BNSkpJSUpFREdDRURDQ0VBRlVORVVNT1VORVZVT0dFR0VDRUNFUERDQ0VDRUVERUdFRUVER0dGRUVFR0VFRUVFR0dFRUZHSEdIR0hISUdJSElIR0hIR0hISElISEhGRUdGRUZFRkVERERDQ0RCREJDP/7QMQ PAFVmYQPAAEAAAAPAAAEgAAAAAund2R2d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d//sA4gAAAAAAAwAABpFraWtpampoaGdnZ2ZlZWVlZGRkZGNjY2NjY2JiYmFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFiY2NjY2RkZGRlZWVmZmdnZ2hoaGlpaWlqampqa2tsbW1ubm9wcHFyc3N0dXV2dnd4eXp7fH1+f4CBgoOEhYaHiImKi4yNjo+QkZKTlJWWl5iZmpucnZ6foKGio6SlpqeoqaqrrK2ur7CxsrO0tbW3uLm6u7y9vr/AwcLDxMXGx8jJysvMzc7P0NHS09TV1tfY2drb3N3e3+Dh4uPk5ebn6Onq6+zt7u/w8fLz9PX29/j5+vv8/f7/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/9k=";
 
 export function CallSummarization({ interaction }: CallSummarizationProps) {
   const [summary, setSummary] = useState<SummarizeCallOutput | null>(null);
@@ -40,6 +47,12 @@ export function CallSummarization({ interaction }: CallSummarizationProps) {
       setIsLoading(false);
     }
   };
+  
+  const callDetails = [
+      { label: "Discussion", value: interaction.discussion },
+      { label: "Output / Resolution", value: interaction.output },
+      { label: "Next Action", value: interaction.nextAction },
+  ].filter(detail => detail.value);
 
   return (
     <div className="w-full space-y-4">
@@ -58,7 +71,7 @@ export function CallSummarization({ interaction }: CallSummarizationProps) {
           ) : (
             <Sparkles className="mr-2 h-4 w-4" />
           )}
-          Summarize
+          AI Summarize
         </Button>
       </div>
 
@@ -90,6 +103,29 @@ export function CallSummarization({ interaction }: CallSummarizationProps) {
             </AlertDescription>
         </Alert>
       )}
+      
+      {(callDetails.length > 0 || interaction.transcript) && (
+        <Collapsible>
+            <CollapsibleTrigger className='flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-foreground w-full justify-center py-1 rounded-md bg-muted/50'>
+                View Details <ChevronDown className='size-4' />
+            </CollapsibleTrigger>
+            <CollapsibleContent className='mt-4 space-y-4'>
+                {callDetails.map(detail => (
+                    <div key={detail.label}>
+                        <h4 className="font-semibold">{detail.label}</h4>
+                        <p className="text-muted-foreground">{detail.value}</p>
+                    </div>
+                ))}
+                {interaction.transcript && (
+                     <div>
+                        <h4 className="font-semibold">Transcript</h4>
+                        <Textarea readOnly value={interaction.transcript} className="mt-1 min-h-48 font-mono text-xs" />
+                    </div>
+                )}
+            </CollapsibleContent>
+        </Collapsible>
+      )}
+
     </div>
   );
 }
