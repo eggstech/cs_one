@@ -62,7 +62,6 @@ export function LogInteractionForm({ onAddInteraction, ticketId, isCallActive: i
       discussion: '',
       output: '',
       nextAction: '',
-      transcript: ''
   });
 
   useEffect(() => {
@@ -70,6 +69,8 @@ export function LogInteractionForm({ onAddInteraction, ticketId, isCallActive: i
       setInteractionChannel('Phone');
       setIsLiveCall(true);
       setCallDetails(prev => ({ ...prev, startTime: new Date().toISOString() }));
+    } else {
+      setIsLiveCall(false);
     }
   }, [initialIsCallActive]);
   
@@ -98,7 +99,7 @@ export function LogInteractionForm({ onAddInteraction, ticketId, isCallActive: i
   const handleAddReply = () => {
     let interactionData: Omit<Interaction, 'id' | 'date' | 'agent'>;
 
-    if (interactionChannel === 'Call') {
+    if (interactionChannel === 'Phone') {
         if (!callDetails.purpose || !callDetails.discussion) {
             toast({ variant: "destructive", title: "Missing Fields", description: "Please fill out all call details."});
             return;
@@ -109,9 +110,9 @@ export function LogInteractionForm({ onAddInteraction, ticketId, isCallActive: i
             type: 'Call',
             channel: 'Phone',
             content: callDetails.purpose,
-            ...callDetails,
             duration: `${Math.floor(durationInSeconds / 60)}m ${durationInSeconds % 60}s`,
             ticketId,
+            ...callDetails,
         };
     } else {
         if (interactionContent.trim() === "") {
@@ -130,48 +131,39 @@ export function LogInteractionForm({ onAddInteraction, ticketId, isCallActive: i
     
     // Reset form
     setInteractionContent("");
-    setCallDetails({ startTime: '', endTime: '', purpose: '', discussion: '', output: '', nextAction: '', transcript: '' });
+    setCallDetails({ startTime: '', endTime: '', purpose: '', discussion: '', output: '', nextAction: '' });
     setInteractionChannel('Note');
     setCallDuration(0);
   };
 
   const renderInteractionForm = () => {
-      if (interactionChannel === 'Call') {
-          if (isLiveCall) {
-              return (
-                 <div className="flex items-center justify-between p-4 border rounded-lg bg-muted">
-                    <div className="flex items-center gap-2">
-                        <Badge variant={'default'}>
-                            <Phone className="mr-2 h-4 w-4 animate-pulse"/>
-                            Calling
-                        </Badge>
-                        <span className="text-sm text-muted-foreground font-mono">{formatDuration(callDuration)}</span>
-                    </div>
-                    <Button variant="destructive" size="sm" onClick={handleEndCall}>
-                        <PhoneOff className="mr-2 h-4 w-4"/>
-                        End Call
-                    </Button>
+      if (initialIsCallActive && isLiveCall) {
+          return (
+             <div className="flex items-center justify-between p-4 border rounded-lg bg-muted">
+                <div className="flex items-center gap-2">
+                    <Badge variant={'default'}>
+                        <Phone className="mr-2 h-4 w-4 animate-pulse"/>
+                        Calling
+                    </Badge>
+                    <span className="text-sm text-muted-foreground font-mono">{formatDuration(callDuration)}</span>
                 </div>
-              );
-          }
+                <Button variant="destructive" size="sm" onClick={handleEndCall}>
+                    <PhoneOff className="mr-2 h-4 w-4"/>
+                    End Call
+                </Button>
+            </div>
+          );
+      }
+
+      if (interactionChannel === 'Phone') {
           return (
               <div className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                          <Label htmlFor="call-start">Start Time</Label>
-                          <Input id="call-start" type="datetime-local" value={callDetails.startTime} onChange={e => setCallDetails({...callDetails, startTime: e.target.value})} />
-                      </div>
-                      <div className="space-y-2">
-                          <Label htmlFor="call-end">End Time</Label>
-                          <Input id="call-end" type="datetime-local" value={callDetails.endTime} onChange={e => setCallDetails({...callDetails, endTime: e.target.value})} />
-                      </div>
-                  </div>
-                  <div className="space-y-2">
-                      <Label htmlFor="call-purpose">Purpose</Label>
+                   <div className="space-y-2">
+                      <Label htmlFor="call-purpose">Purpose *</Label>
                       <Input id="call-purpose" placeholder="e.g., Follow up on recent order" value={callDetails.purpose} onChange={e => setCallDetails({...callDetails, purpose: e.target.value})} />
                   </div>
                   <div className="space-y-2">
-                      <Label htmlFor="call-discussion">Discussion Summary</Label>
+                      <Label htmlFor="call-discussion">Discussion Summary *</Label>
                       <Textarea id="call-discussion" placeholder="Summarize the key points of the conversation..." value={callDetails.discussion} onChange={e => setCallDetails({...callDetails, discussion: e.target.value})} />
                   </div>
                    <div className="space-y-2">
@@ -181,10 +173,6 @@ export function LogInteractionForm({ onAddInteraction, ticketId, isCallActive: i
                    <div className="space-y-2">
                       <Label htmlFor="call-next-action">Next Action</Label>
                       <Input id="call-next-action" placeholder="e.g., Follow up in 3 days to check shipping status" value={callDetails.nextAction} onChange={e => setCallDetails({...callDetails, nextAction: e.target.value})} />
-                  </div>
-                   <div className="space-y-2">
-                      <Label htmlFor="call-transcript">Transcript</Label>
-                      <Textarea id="call-transcript" placeholder="Paste or type the call transcript here..." className="min-h-32" value={callDetails.transcript} onChange={e => setCallDetails({...callDetails, transcript: e.target.value})} />
                   </div>
               </div>
           )
@@ -210,13 +198,15 @@ export function LogInteractionForm({ onAddInteraction, ticketId, isCallActive: i
       );
   }
 
+  const showChannelSelector = !initialIsCallActive || (initialIsCallActive && !isLiveCall);
+
   return (
     <Card>
         <CardHeader>
             <CardTitle>Log Interaction</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-            {!isLiveCall && (
+            {showChannelSelector && (
                 <div className="space-y-2">
                     <Label htmlFor="interaction-channel">Channel</Label>
                     <Select value={interactionChannel} onValueChange={(value: InteractionChannel) => setInteractionChannel(value)}>
@@ -238,7 +228,7 @@ export function LogInteractionForm({ onAddInteraction, ticketId, isCallActive: i
             )}
             {renderInteractionForm()}
         </CardContent>
-       {!isLiveCall && (
+       {(!initialIsCallActive || (initialIsCallActive && !isLiveCall)) && (
             <CardFooter className="justify-end">
                 <Button onClick={handleAddReply}>
                     <Send className="mr-2 h-4 w-4" />
