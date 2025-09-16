@@ -15,6 +15,7 @@ import {
   ChevronLeft,
   Play,
   Phone,
+  AreaChart,
 } from 'lucide-react';
 import { Icons } from '../icons';
 import { Switch } from '../ui/switch';
@@ -30,6 +31,7 @@ export function AppSidebar() {
     { href: '/customers', label: 'Customers', icon: <Users className="size-5" /> },
     { href: '/tickets', label: 'Tickets', icon: <Ticket className="size-5" /> },
     { href: '/call-history', label: 'Call History', icon: <Phone className="size-5" /> },
+    { href: '/reports', label: 'Reports', icon: <AreaChart className="size-5" /> },
     { href: '/merge', label: 'Merge Profiles', icon: <GitMerge className="size-5" /> },
     { href: '/simulate', label: 'Simulate', icon: <Play className="size-5" /> },
     { href: '/settings', label: 'Settings', icon: <Settings className="size-5" /> },
