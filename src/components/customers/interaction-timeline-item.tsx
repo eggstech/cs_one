@@ -10,7 +10,6 @@ import { Button } from "../ui/button";
 import { Label } from "../ui/label";
 import { Textarea } from "../ui/textarea";
 import { summarizeCall, SummarizeCallOutput } from "@/ai/flows/summarize-call";
-import { Input } from "../ui/input";
 import Link from "next/link";
 import {
   DropdownMenu,
@@ -22,7 +21,7 @@ import { Badge } from "../ui/badge";
 
 interface InteractionTimelineItemProps {
   interaction: Interaction;
-  onCallEnd?: (interaction: Interaction) => void;
+  onUpdateInteraction: (interaction: Interaction) => void;
 }
 
 const getIcon = (type: Interaction['type']) => {
@@ -40,53 +39,15 @@ const getIcon = (type: Interaction['type']) => {
   }
 };
 
-export function InteractionTimelineItem({ interaction, onCallEnd }: InteractionTimelineItemProps) {
+export function InteractionTimelineItem({ interaction, onUpdateInteraction }: InteractionTimelineItemProps) {
   const [isSummarizing, setIsSummarizing] = useState(false);
   const [summary, setSummary] = useState<SummarizeCallOutput | null>(null);
   const [hydrated, setHydrated] = useState(false);
 
-  // State for live call management
-  const [isLive, setIsLive] = useState(interaction.isLive || false);
-  const [duration, setDuration] = useState(0);
-  const [callDetails, setCallDetails] = useState({
-    purpose: interaction.purpose || '',
-    discussion: interaction.discussion || '',
-    output: interaction.output || '',
-    nextAction: interaction.nextAction || '',
-  });
-
   useEffect(() => {
     setHydrated(true);
-    let timer: NodeJS.Timeout;
-    if (isLive) {
-      timer = setInterval(() => {
-        setDuration(prev => prev + 1);
-      }, 1000);
-    }
-    return () => clearInterval(timer);
-  }, [isLive]);
+  }, []);
   
-  const formatDuration = (seconds: number) => {
-      const date = new Date(0);
-      date.setSeconds(seconds);
-      const time = date.toISOString().substr(14, 5);
-      return time;
-  };
-
-  const handleEndCall = () => {
-    setIsLive(false);
-    if (onCallEnd) {
-        onCallEnd({
-            ...interaction,
-            ...callDetails,
-            isLive: false,
-            duration: formatDuration(duration),
-            transcript: `Agent: Thank you for calling CS-One, how can I help?\nCustomer: I have a question about my bill.` // Mock transcript
-        });
-    }
-  }
-
-
   const handleSummarize = async () => {
       setIsSummarizing(true);
       setSummary(null);
@@ -108,59 +69,6 @@ export function InteractionTimelineItem({ interaction, onCallEnd }: InteractionT
     'bg-purple-500/20 text-purple-400';
 
   const isCall = interaction.type === 'Call';
-
-  if (isLive) {
-     return (
-        <div className="relative flex items-start gap-4">
-            <div className="flex-shrink-0">
-                <div className={`absolute left-6 top-0 -translate-x-1/2 size-8 rounded-full flex items-center justify-center bg-blue-500/20 text-blue-400`}>
-                    <Phone className="h-5 w-5" />
-                </div>
-                <Avatar className="mt-12 ml-1">
-                    <AvatarImage src={interaction.agent.avatarUrl} alt={interaction.agent.name} />
-                    <AvatarFallback>{interaction.agent.name.slice(0,2)}</AvatarFallback>
-                </Avatar>
-            </div>
-            <div className="flex-1 mt-11">
-                <Card className="bg-card/80 border-primary shadow-lg">
-                    <CardHeader className="p-4">
-                        <div className="flex justify-between items-center">
-                            <CardTitle className="flex items-center gap-2">
-                                <Badge variant={'default'}>
-                                    <Phone className="mr-2 h-4 w-4 animate-pulse"/>
-                                    Live Call
-                                </Badge>
-                                <span className="text-sm text-muted-foreground font-mono">{formatDuration(duration)}</span>
-                            </CardTitle>
-                            <Button variant="destructive" size="sm" onClick={handleEndCall}>
-                                <Phone className="mr-2 h-4 w-4"/>
-                                End Call
-                            </Button>
-                        </div>
-                    </CardHeader>
-                    <CardContent className="p-4 pt-0 space-y-4">
-                         <div className="space-y-2">
-                            <Label htmlFor="call-purpose">Purpose</Label>
-                            <Input id="call-purpose" placeholder="e.g., Follow up on recent order" value={callDetails.purpose} onChange={e => setCallDetails({...callDetails, purpose: e.target.value})} />
-                            </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="call-discussion">Discussion Summary</Label>
-                                <Textarea id="call-discussion" placeholder="Summarize the key points of the conversation..." value={callDetails.discussion} onChange={e => setCallDetails({...callDetails, discussion: e.target.value})} />
-                            </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="call-output">Output / Resolution</Label>
-                                <Input id="call-output" placeholder="e.g., Customer agreed to exchange, sent return label" value={callDetails.output} onChange={e => setCallDetails({...callDetails, output: e.target.value})} />
-                            </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="call-next-action">Next Action</Label>
-                                <Input id="call-next-action" placeholder="e.g., Follow up in 3 days to check shipping status" value={callDetails.nextAction} onChange={e => setCallDetails({...callDetails, nextAction: e.target.value})} />
-                            </div>
-                    </CardContent>
-                </Card>
-            </div>
-        </div>
-     )
-  }
 
   return (
     <div className="relative flex items-start gap-4">
@@ -259,5 +167,3 @@ export function InteractionTimelineItem({ interaction, onCallEnd }: InteractionT
     </div>
   );
 }
-
-    

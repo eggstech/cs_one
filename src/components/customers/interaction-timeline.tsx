@@ -15,10 +15,6 @@ interface InteractionTimelineProps {
 }
 
 export function InteractionTimeline({ interactions, onUpdateInteraction }: InteractionTimelineProps) {
-  
-  const handleCallEnd = (endedCall: Interaction) => {
-    onUpdateInteraction(endedCall);
-  }
 
   return (
     <Card>
@@ -33,7 +29,7 @@ export function InteractionTimeline({ interactions, onUpdateInteraction }: Inter
                 <InteractionTimelineItem 
                   key={interaction.id} 
                   interaction={interaction}
-                  onCallEnd={handleCallEnd}
+                  onUpdateInteraction={onUpdateInteraction}
                 />
             ))}
         </div>
@@ -41,5 +37,3 @@ export function InteractionTimeline({ interactions, onUpdateInteraction }: Inter
     </Card>
   );
 }
-
-    

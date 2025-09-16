@@ -41,23 +41,7 @@ export default function CustomerProfilePage({ params }: { params: { customerId: 
     const fetchedCustomer = getCustomer(customerId);
     
     if (fetchedCustomer) {
-      if (isCallActive && !fetchedCustomer.interactions.some(i => i.isLive)) {
-        const liveCallInteraction: Interaction = {
-          id: `int-live-${Date.now()}`,
-          type: 'Call',
-          channel: 'Phone',
-          date: new Date().toISOString(),
-          agent: agents[0], // Assuming current user is agent-0
-          content: `Incoming Call`,
-          isLive: true,
-        };
-        setCustomer({
-          ...fetchedCustomer,
-          interactions: [liveCallInteraction, ...fetchedCustomer.interactions],
-        });
-      } else {
-        setCustomer(fetchedCustomer);
-      }
+      setCustomer(fetchedCustomer);
     }
 
     setHydrated(true);
@@ -249,5 +233,3 @@ export default function CustomerProfilePage({ params }: { params: { customerId: 
     </>
   );
 }
-
-    

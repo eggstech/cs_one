@@ -95,7 +95,7 @@ export function LogInteractionForm({ onAddInteraction, ticketId, isCallActive: i
       const date = new Date(0);
       date.setSeconds(seconds);
       const time = date.toISOString().substr(14, 5);
-      return time === '00:00' && seconds > 0 ? '0m 0s' : time;
+      return time;
   };
   
   const handleLogSimpleInteraction = () => {
@@ -144,6 +144,13 @@ export function LogInteractionForm({ onAddInteraction, ticketId, isCallActive: i
     // Reset state
     setCallDuration(0);
     setCallDetails({ purpose: '', discussion: '', output: '', nextAction: '' });
+    // This assumes we want to exit call mode after logging. 
+    // We might need a prop to control this if we want to stay in "post-call" mode.
+    setIsCallLive(false); 
+    if (initialIsCallActive) {
+      // If this form was opened for a call, we might want to reset the URL
+      // but that's a router concern, outside this component's scope.
+    }
   }
 
   if (initialIsCallActive) {
@@ -190,6 +197,12 @@ export function LogInteractionForm({ onAddInteraction, ticketId, isCallActive: i
                     <Label htmlFor="call-next-action">Next Action</Label>
                     <Input id="call-next-action" placeholder="e.g., Follow up in 3 days to check shipping status" value={callDetails.nextAction} onChange={e => setCallDetails({...callDetails, nextAction: e.target.value})} />
                 </div>
+                 {!isCallLive && (
+                    <div className="space-y-2">
+                        <Label>Transcript</Label>
+                        <Textarea readOnly value={mockTranscript} className="min-h-32 font-mono text-xs" />
+                    </div>
+                 )}
             </CardContent>
              <CardFooter className="justify-end">
                 <Button onClick={handleLogCallInteraction} disabled={isCallLive}>
