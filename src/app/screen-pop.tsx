@@ -10,9 +10,10 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from './ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
-import { Phone, UserPlus, ArrowRight } from 'lucide-react';
+import { Phone, UserPlus, ArrowRight, X, PhoneIncoming } from 'lucide-react';
 import { Customer } from '@/lib/types';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 interface ScreenPopProps {
   customer: Customer;
@@ -21,16 +22,26 @@ interface ScreenPopProps {
 }
 
 export function ScreenPop({ customer, open, onOpenChange }: ScreenPopProps) {
+  const router = useRouter();
   const isKnownCaller = customer.name !== 'Unrecognized Caller';
 
   const newTicketLink = `/tickets/new?customerId=${customer.id}&subject=${encodeURIComponent(`Phone Call with ${customer.name}`)}`;
+
+  const handleAnswer = () => {
+    router.push(newTicketLink);
+    onOpenChange(false);
+  };
+  
+  const handleDecline = () => {
+    onOpenChange(false);
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Phone className="h-5 w-5 text-primary" />
+            <PhoneIncoming className="h-5 w-5 text-primary" />
             Incoming Call
           </DialogTitle>
           <DialogDescription>
@@ -53,28 +64,33 @@ export function ScreenPop({ customer, open, onOpenChange }: ScreenPopProps) {
             </div>
           </div>
         </div>
-        <DialogFooter className="sm:justify-start">
+        <DialogFooter className="grid grid-cols-2 gap-2">
           {isKnownCaller ? (
-            <div className="flex w-full gap-2">
-                <Button variant="outline" className="flex-1" onClick={() => onOpenChange(false)} asChild>
-                    <Link href={`/customers/${customer.id}`}>
-                        View Profile <ArrowRight className="ml-2 h-4 w-4" />
-                    </Link>
-                </Button>
-                <Button className="flex-1" onClick={() => onOpenChange(false)} asChild>
-                    <Link href={newTicketLink}>
-                        Create Ticket <UserPlus className="ml-2 h-4 w-4" />
-                    </Link>
-                </Button>
-            </div>
-          ) : (
-             <Button className="w-full bg-accent text-accent-foreground hover:bg-accent/90" onClick={() => onOpenChange(false)} asChild>
-                 <Link href="/tickets/new">
-                    Create New Profile <UserPlus className="ml-2 h-4 w-4" />
+            <>
+              <Button variant="outline" asChild>
+                <Link href={`/customers/${customer.id}`}>
+                  <ArrowRight className="mr-2 h-4 w-4" />
+                  View Profile
                 </Link>
+              </Button>
+              <Button onClick={handleAnswer}>
+                <Phone className="mr-2 h-4 w-4" />
+                Answer
+              </Button>
+            </>
+          ) : (
+             <Button className="col-span-2" onClick={handleAnswer}>
+                <Phone className="mr-2 h-4 w-4" />
+                Answer & Create Profile
             </Button>
           )}
         </DialogFooter>
+         <div className="mt-2">
+            <Button variant="ghost" className="w-full text-muted-foreground" onClick={handleDecline}>
+                <X className="mr-2 h-4 w-4" />
+                Decline
+            </Button>
+        </div>
       </DialogContent>
     </Dialog>
   );

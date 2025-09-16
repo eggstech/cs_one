@@ -45,7 +45,7 @@ export default function TicketDetailPage({ params: { ticketId } }: { params: { t
                 type: 'Call',
                 channel: 'Phone',
                 date: new Date().toISOString(),
-                agent: allAgents[0],
+                agent: allAgents[0], // Assume current user is agent 0
                 content: `Call with ${foundTicket.customerName}`,
                 ticketId: foundTicket.id,
                 isLive: true,
@@ -54,11 +54,37 @@ export default function TicketDetailPage({ params: { ticketId } }: { params: { t
         } else {
             setTicket(foundTicket);
         }
+    } else if (ticketId === 'TKT-007' && isCallActive) {
+      // Handle the case where the ticket is being created from a call
+      const newTicket: Ticket = {
+        id: 'TKT-007',
+        customerId: searchParams.get('customerId') || 'cus-1',
+        customerName: 'John Doe',
+        customerAvatarUrl: 'https://picsum.photos/seed/1/40/40',
+        subject: searchParams.get('subject') || 'Phone Call',
+        status: 'New',
+        agent: allAgents[0],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        interactions: [
+          {
+            id: 'int-call-active',
+            type: 'Call',
+            channel: 'Phone',
+            date: new Date().toISOString(),
+            agent: allAgents[0],
+            content: `Call with John Doe`,
+            ticketId: 'TKT-007',
+            isLive: true,
+          }
+        ],
+      };
+      setTicket(newTicket);
     } else {
         notFound();
     }
     setHydrated(true);
-  }, [ticketId, isCallActive]);
+  }, [ticketId, isCallActive, searchParams]);
   
   const customer = ticket ? getCustomer(ticket.customerId) : undefined;
   const agents = allAgents;
