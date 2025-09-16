@@ -16,7 +16,8 @@ import {
   StickyNote,
   Mail,
   Phone,
-  PhoneOff
+  PhoneOff,
+  Save
 } from "lucide-react";
 import {
   Select,
@@ -58,11 +59,12 @@ Customer: No, that's all.
 Agent: Alright. Have a great day, Mr. Doe.
 `;
 
-export function LogInteractionForm({ onAddInteraction, ticketId, isCallActive = false }: LogInteractionFormProps) {
+export function LogInteractionForm({ onAddInteraction, ticketId, isCallActive: initialIsCallActive = false }: LogInteractionFormProps) {
   const { toast } = useToast();
   
   const [interactionChannel, setInteractionChannel] = useState<InteractionChannel>('Note');
   const [interactionContent, setInteractionContent] = useState("");
+  const [isCallLive, setIsCallLive] = useState(initialIsCallActive);
   const [callDuration, setCallDuration] = useState(0);
    const [callDetails, setCallDetails] = useState({
       purpose: '',
@@ -72,15 +74,22 @@ export function LogInteractionForm({ onAddInteraction, ticketId, isCallActive = 
   });
 
   useEffect(() => {
+    setIsCallLive(initialIsCallActive);
+    if(initialIsCallActive) {
+      setCallDuration(0);
+    }
+  }, [initialIsCallActive]);
+  
+
+  useEffect(() => {
     let timer: NodeJS.Timeout;
-    if (isCallActive) {
-      setCallDuration(0); // Reset timer on new call
+    if (isCallLive) {
       timer = setInterval(() => {
         setCallDuration(prev => prev + 1);
       }, 1000);
     }
     return () => clearInterval(timer);
-  }, [isCallActive]);
+  }, [isCallLive]);
 
   const formatDuration = (seconds: number) => {
       const date = new Date(0);
@@ -109,6 +118,10 @@ export function LogInteractionForm({ onAddInteraction, ticketId, isCallActive = 
   };
   
   const handleEndCall = () => {
+    setIsCallLive(false);
+  }
+  
+  const handleLogCallInteraction = () => {
     const durationStr = formatDuration(callDuration);
     
     const finalContent = callDetails.purpose || `Call ended after ${durationStr}`;
@@ -133,22 +146,31 @@ export function LogInteractionForm({ onAddInteraction, ticketId, isCallActive = 
     setCallDetails({ purpose: '', discussion: '', output: '', nextAction: '' });
   }
 
-  if (isCallActive) {
+  if (initialIsCallActive) {
     return (
         <Card>
             <CardHeader>
                 <div className="flex items-center justify-between">
                      <CardTitle className="flex items-center gap-2">
-                        <Badge variant={'default'}>
-                            <Phone className="mr-2 h-4 w-4 animate-pulse"/>
-                            Live Call
-                        </Badge>
+                        {isCallLive ? (
+                            <Badge variant={'default'}>
+                                <Phone className="mr-2 h-4 w-4 animate-pulse"/>
+                                Live Call
+                            </Badge>
+                        ) : (
+                           <Badge variant={'destructive'}>
+                                <PhoneOff className="mr-2 h-4 w-4"/>
+                                Call Ended
+                            </Badge>
+                        )}
                          <span className="text-sm text-muted-foreground font-mono">{formatDuration(callDuration)}</span>
                      </CardTitle>
-                     <Button variant="destructive" size="sm" onClick={handleEndCall}>
-                        <PhoneOff className="mr-2 h-4 w-4"/>
-                        End Call
-                    </Button>
+                     {isCallLive && (
+                        <Button variant="destructive" size="sm" onClick={handleEndCall}>
+                            <PhoneOff className="mr-2 h-4 w-4"/>
+                            End Call
+                        </Button>
+                     )}
                 </div>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -170,9 +192,9 @@ export function LogInteractionForm({ onAddInteraction, ticketId, isCallActive = 
                 </div>
             </CardContent>
              <CardFooter className="justify-end">
-                <Button variant="outline">
-                    <Send className="mr-2 h-4 w-4" />
-                    Log Notes
+                <Button onClick={handleLogCallInteraction} disabled={isCallLive}>
+                    <Save className="mr-2 h-4 w-4" />
+                    Log Call
                 </Button>
             </CardFooter>
         </Card>
