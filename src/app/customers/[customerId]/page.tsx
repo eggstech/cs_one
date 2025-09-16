@@ -39,9 +39,37 @@ export default function CustomerProfilePage({ params }: { params: { customerId: 
   useEffect(() => {
     const { customerId } = params;
     const fetchedCustomer = getCustomer(customerId);
-    setCustomer(fetchedCustomer);
+    
+    if (fetchedCustomer) {
+      if (isCallActive && !fetchedCustomer.interactions.some(i => i.isLive)) {
+        const liveCallInteraction: Interaction = {
+          id: `int-live-${Date.now()}`,
+          type: 'Call',
+          channel: 'Phone',
+          date: new Date().toISOString(),
+          agent: agents[0], // Assuming current user is agent-0
+          content: `Incoming Call`,
+          isLive: true,
+        };
+        setCustomer({
+          ...fetchedCustomer,
+          interactions: [liveCallInteraction, ...fetchedCustomer.interactions],
+        });
+      } else {
+        setCustomer(fetchedCustomer);
+      }
+    }
+
     setHydrated(true);
-  }, [params]);
+  }, [params, isCallActive]);
+
+  const handleUpdateInteraction = (updatedInteraction: Interaction) => {
+    setCustomer(prev => {
+        if (!prev) return;
+        const newInteractions = prev.interactions.map(i => i.id === updatedInteraction.id ? updatedInteraction : i);
+        return { ...prev, interactions: newInteractions };
+    });
+  }
 
   if (!hydrated) {
     // Show a loading state or a skeleton screen while the customer is being fetched.
@@ -193,7 +221,7 @@ export default function CustomerProfilePage({ params }: { params: { customerId: 
             
             <TabsContent value="timeline" className="space-y-6">
               <LogInteractionForm onAddInteraction={handleAddInteraction} isCallActive={isCallActive} />
-              <InteractionTimeline interactions={customer.interactions} />
+              <InteractionTimeline interactions={customer.interactions} onUpdateInteraction={handleUpdateInteraction} />
             </TabsContent>
             
             <TabsContent value="tickets">
@@ -221,3 +249,5 @@ export default function CustomerProfilePage({ params }: { params: { customerId: 
     </>
   );
 }
+
+    
