@@ -1,7 +1,7 @@
 
 'use client';
 import { getCustomer, getTicketsForCustomer, agents } from "@/lib/data";
-import { notFound } from "next/navigation";
+import { notFound, useSearchParams } from "next/navigation";
 import {
   Card,
   CardContent,
@@ -29,14 +29,34 @@ import { EditCustomerProfileDialog } from "@/components/customers/edit-customer-
 
 export default function CustomerProfilePage({ params: { customerId } }: { params: { customerId: string } }) {
   const { toast } = useToast();
+  const searchParams = useSearchParams();
+  const isCallActive = searchParams.get('call') === 'true';
+
   const [customer, setCustomer] = useState<Customer | undefined>(undefined);
   const [hydrated, setHydrated] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   useEffect(() => {
-    setCustomer(getCustomer(customerId));
+    const fetchedCustomer = getCustomer(customerId);
+    if (fetchedCustomer) {
+       if(isCallActive && !fetchedCustomer.interactions.some(i => i.id === 'int-call-active')) {
+            const callInteraction: Interaction = {
+                id: 'int-call-active',
+                type: 'Call',
+                channel: 'Phone',
+                date: new Date().toISOString(),
+                agent: agents[0], // Assume current user is agent 0
+                content: `Call with ${fetchedCustomer.name}`,
+                ticketId: undefined,
+                isLive: true,
+            };
+            setCustomer({ ...fetchedCustomer, interactions: [callInteraction, ...fetchedCustomer.interactions]});
+        } else {
+            setCustomer(fetchedCustomer);
+        }
+    }
     setHydrated(true);
-  }, [customerId]);
+  }, [customerId, isCallActive]);
 
   if (!hydrated) {
     // Show a loading state or a skeleton screen while the customer is being fetched.
@@ -77,6 +97,14 @@ export default function CustomerProfilePage({ params: { customerId } }: { params
         description: `Your ${interactionData.channel} interaction has been logged.`,
     });
   };
+  
+  const handleEndCall = (callInteraction: Interaction) => {
+      setCustomer(prevCustomer => {
+          if (!prevCustomer) return;
+          const updatedInteractions = prevCustomer.interactions.map(i => i.id === callInteraction.id ? callInteraction : i);
+          return { ...prevCustomer, interactions: updatedInteractions };
+      });
+  };
 
   const handleUpdateCustomer = (updatedData: Partial<Customer>) => {
     if (!customer) return;
@@ -96,7 +124,7 @@ export default function CustomerProfilePage({ params: { customerId } }: { params
     Gold: "text-yellow-500",
   }
 
-  const callLink = `/tickets/new?customerId=${customer.id}&subject=${encodeURIComponent(`Phone Call with ${customer.name}`)}`;
+  const callLink = `/customers/${customer.id}?call=true`;
 
   return (
     <>
@@ -188,7 +216,7 @@ export default function CustomerProfilePage({ params: { customerId } }: { params
             
             <TabsContent value="timeline" className="space-y-6">
               <LogInteractionForm onAddInteraction={handleAddInteraction} />
-              <InteractionTimeline interactions={customer.interactions} />
+              <InteractionTimeline interactions={customer.interactions} onCallEnd={handleEndCall}/>
             </TabsContent>
             
             <TabsContent value="tickets">

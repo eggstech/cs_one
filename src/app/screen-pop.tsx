@@ -1,3 +1,4 @@
+
 'use client';
 
 import {
@@ -25,10 +26,10 @@ export function ScreenPop({ customer, open, onOpenChange }: ScreenPopProps) {
   const router = useRouter();
   const isKnownCaller = customer.name !== 'Unrecognized Caller';
 
-  const newTicketLink = `/tickets/new?customerId=${customer.id}&subject=${encodeURIComponent(`Phone Call with ${customer.name}`)}`;
+  const answerLink = `/customers/${customer.id}?call=true`;
 
   const handleAnswer = () => {
-    router.push(newTicketLink);
+    router.push(answerLink);
     onOpenChange(false);
   };
   
@@ -68,7 +69,11 @@ export function ScreenPop({ customer, open, onOpenChange }: ScreenPopProps) {
           {isKnownCaller ? (
             <>
               <Button variant="outline" asChild>
-                <Link href={`/customers/${customer.id}`}>
+                <Link href={`/customers/${customer.id}`} onClick={(e) => {
+                    e.preventDefault(); 
+                    const newWindow = window.open(`/customers/${customer.id}`, '_blank', 'noopener,noreferrer');
+                    if (newWindow) newWindow.opener = null;
+                }}>
                   <ArrowRight className="mr-2 h-4 w-4" />
                   View Profile
                 </Link>

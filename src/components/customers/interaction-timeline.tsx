@@ -1,3 +1,4 @@
+
 import { Interaction } from "@/lib/types";
 import {
   Card,
@@ -10,9 +11,10 @@ import { InteractionTimelineItem } from "./interaction-timeline-item";
 
 interface InteractionTimelineProps {
   interactions: Interaction[];
+  onCallEnd?: (interaction: Interaction) => void;
 }
 
-export function InteractionTimeline({ interactions }: InteractionTimelineProps) {
+export function InteractionTimeline({ interactions, onCallEnd }: InteractionTimelineProps) {
   return (
     <Card>
       <CardHeader>
@@ -23,7 +25,7 @@ export function InteractionTimeline({ interactions }: InteractionTimelineProps) 
         <div className="relative space-y-8">
             <div className="absolute left-6 top-2 bottom-2 w-0.5 bg-border -translate-x-1/2" aria-hidden="true"></div>
             {interactions.map((interaction) => (
-                <InteractionTimelineItem key={interaction.id} interaction={interaction} />
+                <InteractionTimelineItem key={interaction.id} interaction={interaction} onCallEnd={onCallEnd} />
             ))}
         </div>
       </CardContent>
