@@ -5,6 +5,17 @@ export type Identity = {
   identifier: string;
 };
 
+export type CallEvent = {
+  id: string;
+  type: 'Initiated' | 'Ringing' | 'Answered' | 'Missed' | 'Ended' | 'Transferred';
+  date: string;
+  agent: {
+    id: string;
+    name: string;
+    avatarUrl: string;
+  };
+};
+
 export type Interaction = {
   id: string;
   type: 'Call' | 'Chat' | 'Note' | 'Ticket';
@@ -23,6 +34,7 @@ export type Interaction = {
   content: string; // for notes/chats/purpose
   ticketId?: string;
   isLive?: boolean; // for live interactions like calls
+  events?: CallEvent[]; // for call history
   
   // Detailed call fields
   startTime?: string;

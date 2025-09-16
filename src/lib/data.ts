@@ -1,4 +1,4 @@
-import { Customer, Ticket, Interaction, Order } from './types';
+import { Customer, Ticket, Interaction, Order, CallEvent } from './types';
 import { addHours, isAfter, subHours, subMinutes } from 'date-fns';
 
 export const agents = [
@@ -23,7 +23,13 @@ const interactions: Interaction[] = [
     recordingUrl: '#',
     summary: 'Initial inquiry about order status.',
     content: 'Customer called to ask about the shipping status of order #ORD-001.',
-    ticketId: 'TKT-001'
+    ticketId: 'TKT-001',
+    events: [
+        { id: 'evt-1-1', type: 'Initiated', date: '2024-07-22T14:29:58Z', agent: agents[0] },
+        { id: 'evt-1-2', type: 'Ringing', date: '2024-07-22T14:30:00Z', agent: agents[0] },
+        { id: 'evt-1-3', type: 'Answered', date: '2024-07-22T14:30:05Z', agent: agents[0] },
+        { id: 'evt-1-4', type: 'Ended', date: '2024-07-22T14:35:37Z', agent: agents[0] },
+    ]
   },
   {
     id: 'int-2',
@@ -173,7 +179,16 @@ const interactions: Interaction[] = [
     channel: 'Phone',
     date: '2024-07-26T12:00:00Z',
     agent: agents[1],
-    content: 'Missed call from customer.'
+    content: 'Missed call from customer.',
+    events: [
+        { id: 'evt-17-1', type: 'Initiated', date: '2024-07-26T11:59:58Z', agent: agents[0] },
+        { id: 'evt-17-2', type: 'Ringing', date: '2024-07-26T12:00:00Z', agent: agents[0] },
+        { id: 'evt-17-3', type: 'Missed', date: '2024-07-26T12:00:20Z', agent: agents[0] },
+        { id: 'evt-17-4', type: 'Transferred', date: '2024-07-26T12:00:21Z', agent: agents[1] },
+        { id: 'evt-17-5', type: 'Ringing', date: '2024-07-26T12:00:22Z', agent: agents[1] },
+        { id: 'evt-17-6', type: 'Missed', date: '2024-07-26T12:00:42Z', agent: agents[1] },
+        { id: 'evt-17-7', type: 'Ended', date: '2024-07-26T12:00:45Z', agent: agents[1] },
+    ]
   },
   {
     id: 'int-18',
