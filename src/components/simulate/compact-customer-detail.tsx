@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Customer, Interaction, Ticket } from '@/lib/types';

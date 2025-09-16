@@ -18,17 +18,24 @@ import {
 import { customers } from '@/lib/data';
 import { ScreenPop } from '@/components/screen-pop';
 import { Customer } from '@/lib/types';
-import { CompactCustomerView } from '@/components/simulate/compact-customer-view';
+import { CompactAppSidebar } from '@/components/simulate/compact-app-sidebar';
 import { cn } from '@/lib/utils';
+
+export type SidebarView = 
+    | { type: 'customerList' }
+    | { type: 'customerDetail', customerId: string };
 
 export default function SimulatePage() {
   const [isScreenPopVisible, setScreenPopVisible] = useState(false);
   const [activeCustomer, setActiveCustomer] = useState<Customer>(customers[0]);
   const [isSidebarWide, setIsSidebarWide] = useState(false);
+  const [sidebarView, setSidebarView] = useState<SidebarView>({ type: 'customerList' });
   
   const handleSimulateCall = (customer: Customer) => {
     setActiveCustomer(customer);
     setScreenPopVisible(true);
+    // When a call comes in, show that customer in the sidebar
+    setSidebarView({ type: 'customerDetail', customerId: customer.id });
   };
 
   return (
@@ -86,7 +93,11 @@ export default function SimulatePage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <CompactCustomerView customer={customers[0]} isWide={isSidebarWide} />
+              <CompactAppSidebar 
+                view={sidebarView}
+                onSetView={setSidebarView}
+                isWide={isSidebarWide}
+              />
             </CardContent>
           </Card>
       </div>
