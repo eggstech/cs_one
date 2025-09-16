@@ -35,8 +35,6 @@ export default function CustomerProfilePage({ params }: { params: { customerId: 
   const [customer, setCustomer] = useState<Customer | undefined>(undefined);
   const [hydrated, setHydrated] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [isLiveCall, setIsLiveCall] = useState(isCallActive);
-
 
   useEffect(() => {
     const { customerId } = params;
@@ -44,10 +42,6 @@ export default function CustomerProfilePage({ params }: { params: { customerId: 
     setCustomer(fetchedCustomer);
     setHydrated(true);
   }, [params]);
-  
-  useEffect(() => {
-    setIsLiveCall(isCallActive);
-  }, [isCallActive]);
 
   if (!hydrated) {
     // Show a loading state or a skeleton screen while the customer is being fetched.
@@ -87,10 +81,6 @@ export default function CustomerProfilePage({ params }: { params: { customerId: 
         title: `Interaction Added`,
         description: `Your ${interactionData.channel} interaction has been logged.`,
     });
-    
-    if (interactionData.type === 'Call') {
-        setIsLiveCall(false);
-    }
   };
 
   const handleUpdateCustomer = (updatedData: Partial<Customer>) => {
@@ -202,7 +192,7 @@ export default function CustomerProfilePage({ params }: { params: { customerId: 
             </TabsList>
             
             <TabsContent value="timeline" className="space-y-6">
-              <LogInteractionForm onAddInteraction={handleAddInteraction} isCallActive={isLiveCall} />
+              <LogInteractionForm onAddInteraction={handleAddInteraction} isCallActive={isCallActive} />
               <InteractionTimeline interactions={customer.interactions} />
             </TabsContent>
             
