@@ -27,7 +27,7 @@ import { LogInteractionForm } from "@/components/customers/log-interaction-form"
 import { useToast } from "@/hooks/use-toast";
 import { EditCustomerProfileDialog } from "@/components/customers/edit-customer-profile-dialog";
 
-export default function CustomerProfilePage({ params }: { params: { customerId: string } }) {
+export default function CustomerProfilePage({ params: { customerId } }: { params: { customerId: string } }) {
   const { toast } = useToast();
   const searchParams = useSearchParams();
   const isCallActive = searchParams.get('call') === 'true';
@@ -37,7 +37,7 @@ export default function CustomerProfilePage({ params }: { params: { customerId: 
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   useEffect(() => {
-    const fetchedCustomer = getCustomer(params.customerId);
+    const fetchedCustomer = getCustomer(customerId);
     if (fetchedCustomer) {
       if (isCallActive && !fetchedCustomer.interactions.some(i => i.isLive)) {
         const liveCallInteraction: Interaction = {
@@ -58,7 +58,7 @@ export default function CustomerProfilePage({ params }: { params: { customerId: 
       }
     }
     setHydrated(true);
-  }, [params.customerId, isCallActive]);
+  }, [customerId, isCallActive]);
 
   if (!hydrated) {
     // Show a loading state or a skeleton screen while the customer is being fetched.
@@ -118,7 +118,7 @@ export default function CustomerProfilePage({ params }: { params: { customerId: 
     setIsEditDialogOpen(false);
   }
 
-  const customerTickets = getTicketsForCustomer(params.customerId);
+  const customerTickets = getTicketsForCustomer(customerId);
 
   const levelColors: { [key: string]: string } = {
     Bronze: "text-[#cd7f32]",
