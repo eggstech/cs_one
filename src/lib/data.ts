@@ -1,4 +1,5 @@
 import { Customer, Ticket, Interaction, Order } from './types';
+import { addHours, isAfter, subHours, subMinutes } from 'date-fns';
 
 export const agents = [
   { id: 'agent-1', name: 'Alex Green', avatarUrl: 'https://picsum.photos/seed/101/40/40' },
@@ -224,6 +225,8 @@ const interactions: Interaction[] = [
   }
 ];
 
+const now = new Date();
+
 const allTickets: Ticket[] = [
   {
     id: 'TKT-001',
@@ -236,6 +239,7 @@ const allTickets: Ticket[] = [
     createdAt: '2024-07-22T14:35:00Z',
     updatedAt: '2024-07-23T10:05:00Z',
     interactions: interactions.filter(i => i.ticketId === 'TKT-001').sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
+    sla: { status: 'Met', resolutionDue: '2024-07-23T14:35:00Z' }
   },
   {
     id: 'TKT-002',
@@ -245,9 +249,10 @@ const allTickets: Ticket[] = [
     subject: 'Issue with new prescription',
     status: 'In-Progress',
     agent: agents[2],
-    createdAt: '2024-07-21T16:00:00Z',
-    updatedAt: '2024-07-21T16:05:00Z',
+    createdAt: subHours(now, 26).toISOString(),
+    updatedAt: subHours(now, 1).toISOString(),
     interactions: interactions.filter(i => i.ticketId === 'TKT-002'),
+    sla: { status: 'Breached', resolutionDue: addHours(subHours(now, 26), 24).toISOString() }
   },
   {
     id: 'TKT-003',
@@ -257,9 +262,10 @@ const allTickets: Ticket[] = [
     subject: 'Return Request for ORD-001',
     status: 'New',
     agent: agents[0],
-    createdAt: '2024-07-24T09:00:00Z',
-    updatedAt: '2024-07-24T11:15:00Z',
+    createdAt: subHours(now, 2).toISOString(),
+    updatedAt: subHours(now, 1).toISOString(),
     interactions: interactions.filter(i => i.ticketId === 'TKT-003').sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
+    sla: { status: 'Met', resolutionDue: addHours(now, 22).toISOString() }
   },
   {
     id: 'TKT-004',
@@ -269,9 +275,10 @@ const allTickets: Ticket[] = [
     subject: 'Question about lens coating',
     status: 'New',
     agent: agents[1],
-    createdAt: '2024-07-25T09:00:00Z',
-    updatedAt: '2024-07-25T09:00:00Z',
+    createdAt: subHours(now, 22).toISOString(),
+    updatedAt: subHours(now, 22).toISOString(),
     interactions: interactions.filter(i => i.ticketId === 'TKT-004').sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
+    sla: { status: 'At Risk', resolutionDue: addHours(subHours(now, 22), 24).toISOString() }
   },
   {
     id: 'TKT-005',
@@ -281,9 +288,10 @@ const allTickets: Ticket[] = [
     subject: 'Cracked lens on delivery',
     status: 'In-Progress',
     agent: agents[2],
-    createdAt: '2024-07-25T10:08:00Z',
-    updatedAt: '2024-07-25T10:08:00Z',
+    createdAt: subHours(now, 40).toISOString(),
+    updatedAt: subHours(now, 18).toISOString(),
     interactions: interactions.filter(i => i.ticketId === 'TKT-005').sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
+    sla: { status: 'Breached', resolutionDue: addHours(subHours(now, 40), 24).toISOString() }
   },
   {
     id: 'TKT-006',
@@ -296,6 +304,7 @@ const allTickets: Ticket[] = [
     createdAt: '2024-07-20T10:00:00Z',
     updatedAt: '2024-07-21T11:00:00Z',
     interactions: interactions.filter(i => i.ticketId === 'TKT-006').sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
+    sla: { status: 'Met', resolutionDue: '2024-07-21T10:00:00Z' }
   },
   {
     id: 'TKT-007',
@@ -305,9 +314,10 @@ const allTickets: Ticket[] = [
     subject: 'Phone Call with John Doe',
     status: 'New',
     agent: agents[0],
-    createdAt: '2024-07-26T10:00:00Z',
-    updatedAt: '2024-07-26T10:00:00Z',
+    createdAt: subMinutes(now, 10).toISOString(),
+    updatedAt: subMinutes(now, 5).toISOString(),
     interactions: interactions.filter(i => i.ticketId === 'TKT-007').sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
+    sla: { status: 'Met', resolutionDue: addHours(now, 24).toISOString() }
   },
    {
     id: 'TKT-008',
@@ -320,6 +330,7 @@ const allTickets: Ticket[] = [
     createdAt: '2024-07-15T11:00:00Z',
     updatedAt: '2024-07-15T11:05:00Z',
     interactions: interactions.filter(i => i.ticketId === 'TKT-008'),
+    sla: { status: 'Met', resolutionDue: '2024-07-16T11:00:00Z' }
   },
   {
     id: 'TKT-009',
@@ -329,9 +340,10 @@ const allTickets: Ticket[] = [
     subject: 'Overdue payment reminder',
     status: 'In-Progress',
     agent: agents[2],
-    createdAt: '2024-07-27T16:00:00Z',
-    updatedAt: '2024-07-27T16:07:19Z',
+    createdAt: subHours(now, 23).toISOString(),
+    updatedAt: subHours(now, 4).toISOString(),
     interactions: interactions.filter(i => i.ticketId === 'TKT-009'),
+    sla: { status: 'At Risk', resolutionDue: addHours(subHours(now, 23), 24).toISOString() }
   },
   {
     id: 'TKT-010',
@@ -341,9 +353,10 @@ const allTickets: Ticket[] = [
     subject: 'Zalo chat inquiry',
     status: 'New',
     agent: agents[0],
-    createdAt: '2024-07-28T10:00:00Z',
-    updatedAt: '2024-07-28T10:01:00Z',
+    createdAt: subHours(now, 1).toISOString(),
+    updatedAt: subHours(now, 1).toISOString(),
     interactions: interactions.filter(i => i.ticketId === 'TKT-010'),
+    sla: { status: 'Met', resolutionDue: addHours(now, 23).toISOString() }
   }
 ];
 

@@ -1,4 +1,5 @@
 
+
 export type Identity = {
   channel: 'Phone' | 'Facebook' | 'Zalo' | 'Email' | 'Instagram';
   identifier: string;
@@ -53,7 +54,7 @@ export type EyeMeasurement = {
   };
   os: {
     sph: string;
-    cyl: string;
+    cyl:string;
     ax: string;
   };
   pd: string;
@@ -103,6 +104,10 @@ export type Ticket = {
   createdAt: string;
   updatedAt: string;
   interactions: Interaction[];
+  sla?: {
+    status: 'Met' | 'At Risk' | 'Breached';
+    resolutionDue: string;
+  }
 };
 
     

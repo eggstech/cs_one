@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -18,9 +19,9 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { tickets as allTickets, agents } from '@/lib/data';
-import { PlusCircle, Filter, GitMerge } from 'lucide-react';
+import { PlusCircle, Filter, GitMerge, Clock } from 'lucide-react';
 import Link from 'next/link';
-import { format } from 'date-fns';
+import { format, formatDistanceToNowStrict, isAfter } from 'date-fns';
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -31,8 +32,42 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Ticket } from '@/lib/types';
 import { MergeTicketsDialog } from '@/components/tickets/merge-tickets-dialog';
+import { cn } from '@/lib/utils';
 
 const ticketStatuses: Ticket['status'][] = ['New', 'In-Progress', 'Resolved', 'Closed'];
+
+const SlaStatusBadge = ({ sla }: { sla: Ticket['sla'] }) => {
+    if (!sla) return <span className="text-muted-foreground">-</span>;
+    const variant: "destructive" | "secondary" | "default" = sla.status === 'Breached' ? 'destructive' : sla.status === 'At Risk' ? 'secondary' : 'default';
+    const textColor = 
+        sla.status === 'Breached' ? 'text-destructive-foreground' :
+        sla.status === 'At Risk' ? 'text-secondary-foreground' :
+        'text-primary-foreground';
+    
+    return <Badge variant={variant} className={cn("capitalize", textColor)}>{sla.status}</Badge>
+}
+
+const SlaTimer = ({ sla }: { sla: Ticket['sla'] }) => {
+    const [hydrated, setHydrated] = useState(false);
+    useEffect(() => { setHydrated(true) }, []);
+
+    if (!hydrated || !sla) return <span className="text-muted-foreground">-</span>;
+
+    const dueDate = new Date(sla.resolutionDue);
+    const now = new Date();
+    const isOverdue = isAfter(now, dueDate);
+    const distance = formatDistanceToNowStrict(dueDate, { addSuffix: true });
+    
+    const textColor = sla.status === 'Breached' ? 'text-destructive' : sla.status === 'At Risk' ? 'text-yellow-600' : 'text-muted-foreground';
+
+    return (
+        <div className={cn("flex items-center gap-2 text-xs", textColor)}>
+            <Clock className="h-3 w-3" />
+            <span>{isOverdue ? `Overdue by ${distance}` : distance}</span>
+        </div>
+    )
+}
+
 
 export default function TicketsPage() {
   const [tickets, setTickets] = useState<Ticket[]>(allTickets);
@@ -42,6 +77,9 @@ export default function TicketsPage() {
 
   useEffect(() => {
     setHydrated(true);
+    // Initial filter application
+    const filteredTickets = allTickets.filter(ticket => statusFilters.includes(ticket.status));
+    setTickets(filteredTickets);
   }, []);
 
   const handleFilterChange = (status: Ticket['status'], checked: boolean) => {
@@ -105,9 +143,10 @@ export default function TicketsPage() {
                 <TableHead>Customer</TableHead>
                 <TableHead>Subject</TableHead>
                 <TableHead>Status</TableHead>
+                <TableHead>SLA Status</TableHead>
                 <TableHead>Agent</TableHead>
-                <TableHead>Created</TableHead>
                 <TableHead>Last Update</TableHead>
+                <TableHead>SLA Timer</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -150,6 +189,9 @@ export default function TicketsPage() {
                     </Badge>
                   </TableCell>
                   <TableCell>
+                      <SlaStatusBadge sla={ticket.sla} />
+                  </TableCell>
+                  <TableCell>
                     <div className="flex items-center gap-2">
                       <Avatar className="h-6 w-6">
                         <AvatarImage src={ticket.agent.avatarUrl} alt={ticket.agent.name} />
@@ -158,8 +200,10 @@ export default function TicketsPage() {
                       <span>{ticket.agent.name}</span>
                     </div>
                   </TableCell>
-                  <TableCell>{hydrated ? format(new Date(ticket.createdAt), 'PP') : ''}</TableCell>
                   <TableCell>{hydrated ? format(new Date(ticket.updatedAt), 'PP') : ''}</TableCell>
+                  <TableCell>
+                      <SlaTimer sla={ticket.sla} />
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>

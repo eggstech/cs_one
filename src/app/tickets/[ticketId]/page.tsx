@@ -14,9 +14,10 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { format } from "date-fns";
+import { format, formatDistanceToNowStrict, isAfter } from "date-fns";
 import {
   ArrowLeft,
+  Clock,
 } from "lucide-react";
 import Link from "next/link";
 import { InteractionTimeline } from "@/components/customers/interaction-timeline";
@@ -28,6 +29,40 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Interaction, Ticket } from "@/lib/types";
+import { cn } from "@/lib/utils";
+
+const SlaInfo = ({ sla }: { sla: Ticket['sla'] }) => {
+    const [hydrated, setHydrated] = useState(false);
+    useEffect(() => { setHydrated(true) }, []);
+    
+    if (!hydrated || !sla) return null;
+
+    const dueDate = new Date(sla.resolutionDue);
+    const now = new Date();
+    const isOverdue = isAfter(now, dueDate);
+    const distance = formatDistanceToNowStrict(dueDate, { addSuffix: true });
+    
+    const statusColor = 
+        sla.status === 'Breached' ? 'text-destructive' :
+        sla.status === 'At Risk' ? 'text-yellow-600' :
+        'text-green-600';
+    
+    return (
+        <>
+            <Separator />
+            <div className="flex justify-between items-center">
+                <span className="text-muted-foreground">SLA Status</span>
+                <span className={cn("font-bold", statusColor)}>{sla.status}</span>
+            </div>
+            <div className="flex justify-between items-center text-xs">
+                <span className="text-muted-foreground flex items-center gap-1"><Clock className="size-3" /> Due Time</span>
+                <span className={cn("font-medium", statusColor)}>
+                    {isOverdue ? `Overdue by ${distance}` : distance}
+                </span>
+            </div>
+        </>
+    )
+}
 
 export default function TicketDetailPage({ params: { ticketId } }: { params: { ticketId: string } }) {
   const searchParams = useSearchParams();
@@ -202,6 +237,7 @@ export default function TicketDetailPage({ params: { ticketId } }: { params: { t
                 <span className="text-muted-foreground">Last Update</span>
                 <span className="font-medium">{hydrated ? format(new Date(ticket.updatedAt), "PPpp") : ""}</span>
               </div>
+              <SlaInfo sla={ticket.sla} />
             </CardContent>
           </Card>
           {customer && (
