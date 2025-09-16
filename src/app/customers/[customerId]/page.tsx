@@ -35,31 +35,19 @@ export default function CustomerProfilePage({ params }: { params: { customerId: 
   const [customer, setCustomer] = useState<Customer | undefined>(undefined);
   const [hydrated, setHydrated] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isLiveCall, setIsLiveCall] = useState(isCallActive);
+
 
   useEffect(() => {
     const { customerId } = params;
     const fetchedCustomer = getCustomer(customerId);
-    if (fetchedCustomer) {
-      if (isCallActive && !fetchedCustomer.interactions.some(i => i.isLive)) {
-        const liveCallInteraction: Interaction = {
-          id: `int-live-${Date.now()}`,
-          type: 'Call',
-          channel: 'Phone',
-          date: new Date().toISOString(),
-          agent: agents[0], // Assume current agent
-          content: 'Incoming Call',
-          isLive: true,
-        };
-        setCustomer({
-          ...fetchedCustomer,
-          interactions: [liveCallInteraction, ...fetchedCustomer.interactions]
-        });
-      } else {
-        setCustomer(fetchedCustomer);
-      }
-    }
+    setCustomer(fetchedCustomer);
     setHydrated(true);
-  }, [params, isCallActive]);
+  }, [params]);
+  
+  useEffect(() => {
+    setIsLiveCall(isCallActive);
+  }, [isCallActive]);
 
   if (!hydrated) {
     // Show a loading state or a skeleton screen while the customer is being fetched.
@@ -99,14 +87,10 @@ export default function CustomerProfilePage({ params }: { params: { customerId: 
         title: `Interaction Added`,
         description: `Your ${interactionData.channel} interaction has been logged.`,
     });
-  };
-  
-  const handleEndCall = (callInteraction: Interaction) => {
-      setCustomer(prevCustomer => {
-          if (!prevCustomer) return undefined;
-          const updatedInteractions = prevCustomer.interactions.map(i => i.id === callInteraction.id ? callInteraction : i);
-          return { ...prevCustomer, interactions: updatedInteractions };
-      });
+    
+    if (interactionData.type === 'Call') {
+        setIsLiveCall(false);
+    }
   };
 
   const handleUpdateCustomer = (updatedData: Partial<Customer>) => {
@@ -218,8 +202,8 @@ export default function CustomerProfilePage({ params }: { params: { customerId: 
             </TabsList>
             
             <TabsContent value="timeline" className="space-y-6">
-              <LogInteractionForm onAddInteraction={handleAddInteraction} />
-              <InteractionTimeline interactions={customer.interactions} onCallEnd={handleEndCall}/>
+              <LogInteractionForm onAddInteraction={handleAddInteraction} isCallActive={isLiveCall} />
+              <InteractionTimeline interactions={customer.interactions} />
             </TabsContent>
             
             <TabsContent value="tickets">
