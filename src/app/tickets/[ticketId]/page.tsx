@@ -3,7 +3,7 @@
 'use client';
 
 import { useState, useEffect } from "react";
-import { getTicket, getCustomer, agents as allAgents } from "@/lib/data";
+import { getTicket, getCustomer, agents as allAgents, interactions as allInteractions } from "@/lib/data";
 import { notFound, useSearchParams } from "next/navigation";
 import {
   Card,
@@ -19,7 +19,7 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import Link from "next/link";
-import { InteractionTimelineItem } from "@/components/customers/interaction-timeline-item";
+import { InteractionTimeline } from "@/components/customers/interaction-timeline";
 import {
   Select,
   SelectContent,
@@ -37,11 +37,18 @@ export default function TicketDetailPage({ params: { ticketId } }: { params: { t
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
-    const foundTicket = getTicket(ticketId);
+    let foundTicket = getTicket(ticketId);
     if (foundTicket) {
-        if(isCallActive && !foundTicket.interactions.some(i => i.id === 'int-call-active')) {
+        // Fetch all interactions for this ticket
+        const ticketInteractions = allInteractions
+            .filter(i => i.ticketId === ticketId)
+            .sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+        
+        foundTicket = { ...foundTicket, interactions: ticketInteractions };
+
+        if(isCallActive && !foundTicket.interactions.some(i => i.isLive)) {
             const callInteraction: Interaction = {
-                id: 'int-call-active',
+                id: `int-call-active-${Date.now()}`,
                 type: 'Call',
                 channel: 'Phone',
                 date: new Date().toISOString(),
@@ -108,13 +115,18 @@ export default function TicketDetailPage({ params: { ticketId } }: { params: { t
     }
   };
 
-  const onCallEnd = (callInteraction: Interaction) => {
-      setTicket(prevTicket => {
-          if (!prevTicket) return;
-          const updatedInteractions = prevTicket.interactions.map(i => i.id === callInteraction.id ? callInteraction : i);
-          return { ...prevTicket, interactions: updatedInteractions };
-      });
-  };
+  const handleAddInteraction = (interaction: Omit<Interaction, 'id' | 'date' | 'agent'>) => {
+     setTicket(prevTicket => {
+        if (!prevTicket) return;
+        const newInteraction: Interaction = {
+          id: `int-${Date.now()}`,
+          date: new Date().toISOString(),
+          agent: allAgents[0], // Assuming current user is agent-0
+          ...interaction,
+        };
+        return { ...prevTicket, interactions: [newInteraction, ...prevTicket.interactions] };
+     })
+  }
 
 
   return (
@@ -134,22 +146,7 @@ export default function TicketDetailPage({ params: { ticketId } }: { params: { t
       </div>
       <div className="grid gap-6 md:grid-cols-3">
         <div className="md:col-span-2 space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Interaction History</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-6">
-                {ticket.interactions.map((interaction) => (
-                  <InteractionTimelineItem
-                    key={interaction.id}
-                    interaction={interaction}
-                    onCallEnd={onCallEnd}
-                  />
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+          <InteractionTimeline interactions={ticket.interactions} />
         </div>
         <div className="space-y-6">
           <Card>
@@ -223,3 +220,5 @@ export default function TicketDetailPage({ params: { ticketId } }: { params: { t
     </div>
   );
 }
+
+    

@@ -6,6 +6,10 @@ export const agents = [
   { id: 'agent-3', name: 'Charlie Brown', avatarUrl: 'https://picsum.photos/seed/103/40/40' },
 ];
 
+export let tickets: Ticket[] = [];
+export const getTicket = (id: string) => tickets.find(t => t.id === id);
+
+
 const interactions: Interaction[] = [
   {
     id: 'int-1',
@@ -17,7 +21,8 @@ const interactions: Interaction[] = [
     agent: agents[0],
     recordingUrl: '#',
     summary: 'Initial inquiry about order status.',
-    content: 'Customer called to ask about the shipping status of order #ORD-001.'
+    content: 'Customer called to ask about the shipping status of order #ORD-001.',
+    ticketId: 'TKT-001'
   },
   {
     id: 'int-2',
@@ -34,7 +39,8 @@ const interactions: Interaction[] = [
     channel: 'Facebook',
     date: '2024-07-23T10:00:00Z',
     agent: agents[1],
-    content: 'Followed up via Facebook chat to provide tracking number. Customer seemed happy.'
+    content: 'Followed up via Facebook chat to provide tracking number. Customer seemed happy.',
+    ticketId: 'TKT-001'
   },
   {
     id: 'int-4',
@@ -42,7 +48,8 @@ const interactions: Interaction[] = [
     channel: 'System',
     date: '2024-07-23T10:05:00Z',
     agent: agents[1],
-    content: 'Customer confirmed receipt of tracking number. Marked ticket as resolved.'
+    content: 'Customer confirmed receipt of tracking number. Marked ticket as resolved.',
+    ticketId: 'TKT-001'
   },
   {
     id: 'int-5',
@@ -182,7 +189,7 @@ export const customers: Customer[] = [
       { channel: 'Email', identifier: 'john.doe@example.com' },
       { channel: 'Facebook', identifier: 'johndoe' },
     ],
-    interactions: [interactions[0], interactions[1], interactions[2], interactions[3], interactions[7], interactions[8], interactions[10], interactions[11], interactions[12], interactions[13], interactions[14]].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
+    interactions: interactions.filter(i => ['cus-1', undefined].includes(getTicket(i.ticketId || '')?.customerId) || !i.ticketId).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
     orders: [
       {
         id: 'ORD-001',
@@ -229,7 +236,7 @@ export const customers: Customer[] = [
       { channel: 'Phone', identifier: '555-0102' },
       { channel: 'Zalo', identifier: 'janesmith.zalo' },
     ],
-    interactions: [interactions[4], interactions[5], interactions[6], interactions[9], interactions[16]].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
+    interactions: interactions.filter(i => ['cus-2', undefined].includes(getTicket(i.ticketId || '')?.customerId) || !i.ticketId).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
     orders: [
        {
         id: 'ORD-002',
@@ -266,7 +273,7 @@ export const customers: Customer[] = [
   },
 ];
 
-export let tickets: Ticket[] = [
+const allTickets: Ticket[] = [
   {
     id: 'TKT-001',
     customerId: 'cus-1',
@@ -277,7 +284,7 @@ export let tickets: Ticket[] = [
     agent: agents[1],
     createdAt: '2024-07-22T14:35:00Z',
     updatedAt: '2024-07-23T10:05:00Z',
-    interactions: interactions.filter(i => i.ticketId === 'TKT-001' || i.id === 'int-1' || i.id === 'int-3' || i.id === 'int-4').sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
+    interactions: interactions.filter(i => i.ticketId === 'TKT-001').sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
   },
   {
     id: 'TKT-002',
@@ -351,11 +358,17 @@ export let tickets: Ticket[] = [
     updatedAt: '2024-07-26T10:00:00Z',
     interactions: interactions.filter(i => i.ticketId === 'TKT-007').sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
   }
-].sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+];
+
+tickets.push(...allTickets);
+tickets.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+
 
 export const getCustomer = (id: string) => customers.find(c => c.id === id);
-export const getTicket = (id: string) => tickets.find(t => t.id === id);
 export const getTicketsForCustomer = (customerId: string) => tickets.filter(t => t.customerId === customerId);
 
 export const allOrders: Order[] = customers.flatMap(c => c.orders);
 export const allProducts: string[] = [...new Set(customers.flatMap(c => c.orders).flatMap(o => o.items).map(i => i.name))];
+    
+// This export needs to be here to avoid circular dependency issues in other files that use it.
+export { allTickets as tickets, interactions };

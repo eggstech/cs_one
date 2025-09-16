@@ -1,4 +1,5 @@
 
+
 'use client';
 import { getCustomer, getTicketsForCustomer, agents } from "@/lib/data";
 import { notFound, useSearchParams } from "next/navigation";
@@ -23,7 +24,6 @@ import { DebtHistoryCard } from "@/components/customers/debt-history-card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useState, useEffect } from 'react';
 import { Customer, Interaction } from "@/lib/types";
-import { LogInteractionForm } from "@/components/customers/log-interaction-form";
 import { useToast } from "@/hooks/use-toast";
 import { EditCustomerProfileDialog } from "@/components/customers/edit-customer-profile-dialog";
 
@@ -40,12 +40,9 @@ export default function CustomerProfilePage({ params }: { params: { customerId: 
     const { customerId } = params;
     const fetchedCustomer = getCustomer(customerId);
     
-    if (fetchedCustomer) {
-      setCustomer(fetchedCustomer);
-    }
-
+    setCustomer(fetchedCustomer);
     setHydrated(true);
-  }, [params, isCallActive]);
+  }, [params]);
 
   if (!hydrated) {
     // Show a loading state or a skeleton screen while the customer is being fetched.
@@ -196,8 +193,11 @@ export default function CustomerProfilePage({ params }: { params: { customerId: 
             </TabsList>
             
             <TabsContent value="timeline" className="space-y-6">
-              <LogInteractionForm onAddInteraction={handleAddInteraction} isCallActive={isCallActive} />
-              <InteractionTimeline interactions={customer.interactions} />
+              <InteractionTimeline 
+                interactions={customer.interactions} 
+                onAddInteraction={handleAddInteraction} 
+                isCallActive={isCallActive}
+               />
             </TabsContent>
             
             <TabsContent value="tickets">
@@ -225,3 +225,5 @@ export default function CustomerProfilePage({ params }: { params: { customerId: 
     </>
   );
 }
+
+    
