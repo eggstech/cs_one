@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -16,6 +16,7 @@ import {
   StickyNote,
   Mail,
   Phone,
+  PhoneOff,
 } from "lucide-react";
 import {
   Select,
@@ -29,6 +30,7 @@ import { Interaction } from "@/lib/types";
 import { Input } from "@/components/ui/input";
 import { Icons } from "@/components/icons";
 import { useToast } from "@/hooks/use-toast";
+import { Badge } from "../ui/badge";
 
 const interactionChannels = [
     { value: 'Note', label: 'Internal Note', icon: StickyNote },
@@ -43,15 +45,18 @@ type InteractionChannel = typeof interactionChannels[number]['value'];
 interface LogInteractionFormProps {
     onAddInteraction: (interactionData: Omit<Interaction, 'id' | 'date' | 'agent'>) => void;
     ticketId?: string;
+    isCallActive?: boolean;
 }
 
-export function LogInteractionForm({ onAddInteraction, ticketId }: LogInteractionFormProps) {
+export function LogInteractionForm({ onAddInteraction, ticketId, isCallActive: initialIsCallActive = false }: LogInteractionFormProps) {
   const { toast } = useToast();
   
   const [interactionChannel, setInteractionChannel] = useState<InteractionChannel>('Note');
   const [interactionContent, setInteractionContent] = useState("");
+  const [isLiveCall, setIsLiveCall] = useState(initialIsCallActive);
+  const [callDuration, setCallDuration] = useState(0);
   const [callDetails, setCallDetails] = useState({
-      startTime: '',
+      startTime: initialIsCallActive ? new Date().toISOString() : '',
       endTime: '',
       purpose: '',
       discussion: '',
@@ -59,6 +64,36 @@ export function LogInteractionForm({ onAddInteraction, ticketId }: LogInteractio
       nextAction: '',
       transcript: ''
   });
+
+  useEffect(() => {
+    if (initialIsCallActive) {
+      setInteractionChannel('Phone');
+      setIsLiveCall(true);
+      setCallDetails(prev => ({ ...prev, startTime: new Date().toISOString() }));
+    }
+  }, [initialIsCallActive]);
+  
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (isLiveCall) {
+      timer = setInterval(() => {
+        setCallDuration(prev => prev + 1);
+      }, 1000);
+    }
+    return () => clearInterval(timer);
+  }, [isLiveCall]);
+  
+  const handleEndCall = () => {
+    setIsLiveCall(false);
+    setCallDetails(prev => ({ ...prev, endTime: new Date().toISOString() }));
+  };
+
+  const formatDuration = (seconds: number) => {
+      const date = new Date(0);
+      date.setSeconds(seconds);
+      const time = date.toISOString().substr(14, 5);
+      return time;
+  };
   
   const handleAddReply = () => {
     let interactionData: Omit<Interaction, 'id' | 'date' | 'agent'>;
@@ -68,12 +103,14 @@ export function LogInteractionForm({ onAddInteraction, ticketId }: LogInteractio
             toast({ variant: "destructive", title: "Missing Fields", description: "Please fill out all call details."});
             return;
         }
+        const durationInSeconds = callDetails.startTime && callDetails.endTime ? Math.round((new Date(callDetails.endTime).getTime() - new Date(callDetails.startTime).getTime()) / 1000) : callDuration;
+        
         interactionData = {
             type: 'Call',
             channel: 'Phone',
             content: callDetails.purpose,
             ...callDetails,
-            duration: callDetails.startTime && callDetails.endTime ? `${Math.round((new Date(callDetails.endTime).getTime() - new Date(callDetails.startTime).getTime()) / 1000 / 60)}m` : undefined,
+            duration: `${Math.floor(durationInSeconds / 60)}m ${durationInSeconds % 60}s`,
             ticketId,
         };
     } else {
@@ -94,10 +131,29 @@ export function LogInteractionForm({ onAddInteraction, ticketId }: LogInteractio
     // Reset form
     setInteractionContent("");
     setCallDetails({ startTime: '', endTime: '', purpose: '', discussion: '', output: '', nextAction: '', transcript: '' });
+    setInteractionChannel('Note');
+    setCallDuration(0);
   };
 
   const renderInteractionForm = () => {
       if (interactionChannel === 'Call') {
+          if (isLiveCall) {
+              return (
+                 <div className="flex items-center justify-between p-4 border rounded-lg bg-muted">
+                    <div className="flex items-center gap-2">
+                        <Badge variant={'default'}>
+                            <Phone className="mr-2 h-4 w-4 animate-pulse"/>
+                            Calling
+                        </Badge>
+                        <span className="text-sm text-muted-foreground font-mono">{formatDuration(callDuration)}</span>
+                    </div>
+                    <Button variant="destructive" size="sm" onClick={handleEndCall}>
+                        <PhoneOff className="mr-2 h-4 w-4"/>
+                        End Call
+                    </Button>
+                </div>
+              );
+          }
           return (
               <div className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -160,32 +216,36 @@ export function LogInteractionForm({ onAddInteraction, ticketId }: LogInteractio
             <CardTitle>Log Interaction</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-            <div className="space-y-2">
-                <Label htmlFor="interaction-channel">Channel</Label>
-                <Select value={interactionChannel} onValueChange={(value: InteractionChannel) => setInteractionChannel(value)}>
-                    <SelectTrigger id="interaction-channel" className="w-[240px]">
-                        <SelectValue placeholder="Select a channel" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        {interactionChannels.map(channel => (
-                            <SelectItem key={channel.value} value={channel.value}>
-                                <div className="flex items-center gap-2">
-                                    <channel.icon className="h-4 w-4" />
-                                    {channel.label}
-                                </div>
-                            </SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
-            </div>
+            {!isLiveCall && (
+                <div className="space-y-2">
+                    <Label htmlFor="interaction-channel">Channel</Label>
+                    <Select value={interactionChannel} onValueChange={(value: InteractionChannel) => setInteractionChannel(value)}>
+                        <SelectTrigger id="interaction-channel" className="w-[240px]">
+                            <SelectValue placeholder="Select a channel" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {interactionChannels.map(channel => (
+                                <SelectItem key={channel.value} value={channel.value}>
+                                    <div className="flex items-center gap-2">
+                                        <channel.icon className="h-4 w-4" />
+                                        {channel.label}
+                                    </div>
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
+            )}
             {renderInteractionForm()}
         </CardContent>
-        <CardFooter className="justify-end">
-            <Button onClick={handleAddReply}>
-                <Send className="mr-2 h-4 w-4" />
-                Add Interaction
-            </Button>
-        </CardFooter>
+       {!isLiveCall && (
+            <CardFooter className="justify-end">
+                <Button onClick={handleAddReply}>
+                    <Send className="mr-2 h-4 w-4" />
+                    Add Interaction
+                </Button>
+            </CardFooter>
+       )}
     </Card>
   );
 }

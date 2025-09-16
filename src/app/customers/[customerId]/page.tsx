@@ -38,25 +38,9 @@ export default function CustomerProfilePage({ params: { customerId } }: { params
 
   useEffect(() => {
     const fetchedCustomer = getCustomer(customerId);
-    if (fetchedCustomer) {
-       if(isCallActive && !fetchedCustomer.interactions.some(i => i.id === 'int-call-active')) {
-            const callInteraction: Interaction = {
-                id: 'int-call-active',
-                type: 'Call',
-                channel: 'Phone',
-                date: new Date().toISOString(),
-                agent: agents[0], // Assume current user is agent 0
-                content: `Call with ${fetchedCustomer.name}`,
-                ticketId: undefined,
-                isLive: true,
-            };
-            setCustomer({ ...fetchedCustomer, interactions: [callInteraction, ...fetchedCustomer.interactions]});
-        } else {
-            setCustomer(fetchedCustomer);
-        }
-    }
+    setCustomer(fetchedCustomer);
     setHydrated(true);
-  }, [customerId, isCallActive]);
+  }, [customerId]);
 
   if (!hydrated) {
     // Show a loading state or a skeleton screen while the customer is being fetched.
@@ -215,7 +199,7 @@ export default function CustomerProfilePage({ params: { customerId } }: { params
             </TabsList>
             
             <TabsContent value="timeline" className="space-y-6">
-              <LogInteractionForm onAddInteraction={handleAddInteraction} />
+              <LogInteractionForm onAddInteraction={handleAddInteraction} isCallActive={isCallActive} />
               <InteractionTimeline interactions={customer.interactions} onCallEnd={handleEndCall}/>
             </TabsContent>
             
