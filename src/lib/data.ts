@@ -93,7 +93,13 @@ const interactions: Interaction[] = [
     agent: agents[0],
     recordingUrl: '#',
     ticketId: 'TKT-003',
-    content: 'Customer called to request a return for order ORD-001. Claims the frames are not as expected.'
+    content: 'Customer called to request a return for order ORD-001. Claims the frames are not as expected.',
+    events: [
+        { id: 'evt-8-1', type: 'Initiated', date: '2024-07-24T10:59:58Z', agent: agents[0] },
+        { id: 'evt-8-2', type: 'Ringing', date: '2024-07-24T11:00:00Z', agent: agents[0] },
+        { id: 'evt-8-3', type: 'Answered', date: '2024-07-24T11:00:10Z', agent: agents[0] },
+        { id: 'evt-8-4', type: 'Ended', date: '2024-07-24T11:12:25Z', agent: agents[0] },
+    ]
   },
   {
     id: 'int-9',
@@ -123,7 +129,12 @@ const interactions: Interaction[] = [
     agent: agents[2],
     recordingUrl: '#',
     ticketId: 'TKT-005',
-    content: 'Customer called about a cracked lens on a recent order.'
+    content: 'Customer called about a cracked lens on a recent order.',
+     events: [
+        { id: 'evt-11-1', type: 'Initiated', date: '2024-07-25T09:59:58Z', agent: agents[2] },
+        { id: 'evt-11-2', type: 'Answered', date: '2024-07-25T10:00:05Z', agent: agents[2] },
+        { id: 'evt-11-3', type: 'Ended', date: '2024-07-25T10:08:50Z', agent: agents[2] },
+    ]
   },
   {
     id: 'int-12',
@@ -170,7 +181,12 @@ const interactions: Interaction[] = [
     duration: '2m 30s',
     agent: agents[0],
     ticketId: 'TKT-007',
-    content: 'Initiated call to discuss return of ORD-001.'
+    content: 'Initiated call to discuss return of ORD-001.',
+    events: [
+        { id: 'evt-16-1', type: 'Initiated', date: '2024-07-26T09:59:58Z', agent: agents[0] },
+        { id: 'evt-16-2', type: 'Answered', date: '2024-07-26T10:00:05Z', agent: agents[0] },
+        { id: 'evt-16-3', type: 'Ended', date: '2024-07-26T10:02:35Z', agent: agents[0] },
+    ]
   },
   {
     id: 'int-17',
@@ -218,7 +234,13 @@ const interactions: Interaction[] = [
     agent: agents[2],
     recordingUrl: '#',
     ticketId: 'TKT-009',
-    content: 'Call regarding a payment reminder for an overdue invoice.'
+    content: 'Call regarding a payment reminder for an overdue invoice.',
+    events: [
+        { id: 'evt-20-1', type: 'Initiated', date: '2024-07-27T15:59:58Z', agent: agents[2] },
+        { id: 'evt-20-2', type: 'Ringing', date: '2024-07-27T16:00:00Z', agent: agents[2] },
+        { id: 'evt-20-3', type: 'Answered', date: '2024-07-27T16:00:08Z', agent: agents[2] },
+        { id: 'evt-20-4', type: 'Ended', date: '2024-07-27T16:07:27Z', agent: agents[2] },
+    ]
   },
    {
     id: 'int-21',
