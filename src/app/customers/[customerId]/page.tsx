@@ -27,8 +27,7 @@ import { LogInteractionForm } from "@/components/customers/log-interaction-form"
 import { useToast } from "@/hooks/use-toast";
 import { EditCustomerProfileDialog } from "@/components/customers/edit-customer-profile-dialog";
 
-export default function CustomerProfilePage({ params }: { params: { customerId: string } }) {
-  const { customerId } = params;
+export default function CustomerProfilePage({ params: { customerId } }: { params: { customerId: string } }) {
   const { toast } = useToast();
   const [customer, setCustomer] = useState<Customer | undefined>(undefined);
   const [hydrated, setHydrated] = useState(false);
