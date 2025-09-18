@@ -192,7 +192,7 @@ export default function TicketDetailPage({ params }: { params: { ticketId: strin
       </div>
       <div className="grid gap-6 md:grid-cols-3">
         <div className="md:col-span-2 space-y-6">
-          <InteractionTimeline interactions={ticket.interactions} />
+          <InteractionTimeline interactions={ticket.interactions} onAddInteraction={handleAddInteraction} isCallActive={isCallActive} />
         </div>
         <div className="space-y-6">
           <Card>
