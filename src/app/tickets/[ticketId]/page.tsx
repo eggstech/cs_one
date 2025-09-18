@@ -2,7 +2,7 @@
 
 'use client';
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect, Suspense, use } from "react";
 import { getTicket, getCustomer, agents as allAgents, interactions as allInteractions } from "@/lib/data";
 import { useSearchParams } from "next/navigation";
 import {
@@ -66,7 +66,7 @@ const SlaInfo = ({ sla }: { sla: Ticket['sla'] }) => {
 }
 
 function TicketDetailClient({ params }: { params: { ticketId: string } }) {
-  const { ticketId } = params;
+  const { ticketId } = use(params);
   const searchParams = useSearchParams();
   const isCallActive = searchParams.get('call') === 'true';
 

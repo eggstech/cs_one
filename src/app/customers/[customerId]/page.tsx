@@ -1,4 +1,5 @@
 
+
 'use client';
 import { getCustomer, getTicketsForCustomer, agents } from "@/lib/data";
 import { useSearchParams } from "next/navigation";
@@ -21,14 +22,14 @@ import { Badge } from "@/components/ui/badge";
 import { TicketHistory } from "@/components/customers/ticket-history";
 import { DebtHistoryCard } from "@/components/customers/debt-history-card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, Suspense, use } from 'react';
 import { Customer, Interaction } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
 import { EditCustomerProfileDialog } from "@/components/customers/edit-customer-profile-dialog";
 import { Loader2 } from "lucide-react";
 
 function CustomerProfileClient({ params }: { params: { customerId: string } }) {
-  const { customerId } = params;
+  const { customerId } = use(params);
   const { toast } = useToast();
   const searchParams = useSearchParams();
   const isCallActive = searchParams.get('call') === 'true';
