@@ -1,6 +1,5 @@
 
 import { Suspense } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -23,17 +22,19 @@ import { Textarea } from '@/components/ui/textarea';
 import { customers, agents, allOrders, allProducts } from '@/lib/data';
 import { ArrowLeft, Phone, Loader2 } from 'lucide-react';
 import Link from 'next/link';
-import { useToast } from '@/hooks/use-toast';
 import { Combobox } from '@/components/ui/combobox';
 
 const ticketCategories = ['Order', 'Product', 'Staffs', 'Policy', 'Other'];
 
 function NewTicketForm() {
   'use client';
+  const { useRouter, useSearchParams } = require('next/navigation');
+  const { useToast } = require('@/hooks/use-toast');
+  const { useState, useEffect } = require('react');
+
   const router = useRouter();
   const searchParams = useSearchParams();
   const { toast } = useToast();
-  const { useState, useEffect } = require('react');
 
   const [customerId, setCustomerId] = useState(searchParams.get('customerId') || '');
   const [agentId, setAgentId] = useState('');
@@ -251,6 +252,7 @@ function NewTicketForm() {
 
 
 export default function NewTicketPage() {
+    const { useSearchParams } = require('next/navigation');
     const searchParams = useSearchParams();
     const isFromCall = !!searchParams.get('subject')?.includes('Phone Call');
 
