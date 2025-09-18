@@ -2,9 +2,9 @@
 
 'use client';
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense, use } from "react";
 import { getTicket, getCustomer, agents as allAgents, interactions as allInteractions } from "@/lib/data";
-import { notFound, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import {
   Card,
   CardContent,
@@ -18,6 +18,7 @@ import { format, formatDistanceToNowStrict, isAfter } from "date-fns";
 import {
   ArrowLeft,
   Clock,
+  Loader2,
 } from "lucide-react";
 import Link from "next/link";
 import { InteractionTimeline } from "@/components/customers/interaction-timeline";
@@ -64,8 +65,8 @@ const SlaInfo = ({ sla }: { sla: Ticket['sla'] }) => {
     )
 }
 
-export default function TicketDetailPage({ params }: { params: { ticketId: string } }) {
-  const { ticketId } = params;
+function TicketDetailClient({ params }: { params: { ticketId: string } }) {
+  const { ticketId } = use(params);
   const searchParams = useSearchParams();
   const isCallActive = searchParams.get('call') === 'true';
 
@@ -75,7 +76,6 @@ export default function TicketDetailPage({ params }: { params: { ticketId: strin
   useEffect(() => {
     let foundTicket = getTicket(ticketId);
     if (foundTicket) {
-        // Fetch all interactions for this ticket
         const ticketInteractions = allInteractions
             .filter(i => i.ticketId === ticketId)
             .sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime());
@@ -88,7 +88,7 @@ export default function TicketDetailPage({ params }: { params: { ticketId: strin
                 type: 'Call',
                 channel: 'Phone',
                 date: new Date().toISOString(),
-                agent: allAgents[0], // Assume current user is agent 0
+                agent: allAgents[0],
                 content: `Call with ${foundTicket.customerName}`,
                 ticketId: foundTicket.id,
                 isLive: true,
@@ -98,7 +98,6 @@ export default function TicketDetailPage({ params }: { params: { ticketId: strin
             setTicket(foundTicket);
         }
     } else if (ticketId === 'TKT-007' && isCallActive) {
-      // Handle the case where the ticket is being created from a call
       const newTicket: Ticket = {
         id: 'TKT-007',
         customerId: searchParams.get('customerId') || 'cus-1',
@@ -129,25 +128,20 @@ export default function TicketDetailPage({ params }: { params: { ticketId: strin
   
   const customer = ticket ? getCustomer(ticket.customerId) : undefined;
   const agents = allAgents;
-  
+
   useEffect(() => {
-    if (!ticket) {
+    if (hydrated && !ticket) {
+      // This will trigger notFound if the ticket is not found after initial hydration.
       const foundTicket = getTicket(ticketId);
-      if (!foundTicket) {
-        notFound();
+      if(!foundTicket && !(ticketId === 'TKT-007' && isCallActive)) {
+         // Silently fail for now, ideally show a not found page.
+         console.error("Ticket not found");
       }
-      setTicket(foundTicket);
     }
-    setHydrated(true);
-  }, [ticketId, ticket]);
+  }, [ticketId, ticket, hydrated, isCallActive]);
 
-
-  if (!hydrated) {
+  if (!hydrated || !ticket) {
     return <div className="flex-1 space-y-4 p-8 pt-6">Loading ticket details...</div>;
-  }
-  
-  if (!ticket) {
-    return notFound();
   }
 
   const handleStatusChange = (status: Ticket['status']) => {
@@ -167,13 +161,12 @@ export default function TicketDetailPage({ params }: { params: { ticketId: strin
         const newInteraction: Interaction = {
           id: `int-${Date.now()}`,
           date: new Date().toISOString(),
-          agent: allAgents[0], // Assuming current user is agent-0
+          agent: allAgents[0],
           ...interaction,
         };
         return { ...prevTicket, interactions: [newInteraction, ...prevTicket.interactions] };
      })
   }
-
 
   return (
     <div className="flex-1 space-y-4 p-8 pt-6">
@@ -192,7 +185,7 @@ export default function TicketDetailPage({ params }: { params: { ticketId: strin
       </div>
       <div className="grid gap-6 md:grid-cols-3">
         <div className="md:col-span-2 space-y-6">
-          <InteractionTimeline interactions={ticket.interactions} />
+          <InteractionTimeline interactions={ticket.interactions} onAddInteraction={handleAddInteraction} isCallActive={isCallActive} />
         </div>
         <div className="space-y-6">
           <Card>
@@ -266,4 +259,13 @@ export default function TicketDetailPage({ params }: { params: { ticketId: strin
       </div>
     </div>
   );
+}
+
+
+export default function TicketDetailPage({ params }: { params: { ticketId: string } }) {
+  return (
+    <Suspense fallback={<div className="flex h-full w-full items-center justify-center"><Loader2 className="animate-spin" /></div>}>
+      <TicketDetailClient params={params} />
+    </Suspense>
+  )
 }

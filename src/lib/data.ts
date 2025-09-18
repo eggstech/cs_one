@@ -7,11 +7,10 @@ export const agents = [
   { id: 'agent-3', name: 'Charlie Brown', avatarUrl: 'https://picsum.photos/seed/103/40/40' },
 ];
 
-export let tickets: Ticket[] = [];
 export const getTicket = (id: string): Ticket | undefined => tickets.find(t => t.id === id);
 
 
-const interactions: Interaction[] = [
+export const interactions: Interaction[] = [
   {
     id: 'int-1',
     type: 'Call',
@@ -21,8 +20,10 @@ const interactions: Interaction[] = [
     duration: '5m 32s',
     agent: agents[0],
     recordingUrl: '#',
-    summary: 'Initial inquiry about order status.',
-    content: 'Customer called to ask about the shipping status of order #ORD-001.',
+    purpose: 'Order Status Inquiry',
+    discussion: 'Customer called to ask about the shipping status of order #ORD-001.',
+    output: 'Provided tracking number and link.',
+    nextAction: 'None, customer satisfied.',
     ticketId: 'TKT-001',
     events: [
         { id: 'evt-1-1', type: 'Initiated', date: '2024-07-22T14:29:58Z', agent: agents[0] },
@@ -46,7 +47,10 @@ const interactions: Interaction[] = [
     channel: 'Facebook',
     date: '2024-07-23T10:00:00Z',
     agent: agents[1],
-    content: 'Followed up via Facebook chat to provide tracking number. Customer seemed happy.',
+    purpose: 'Follow-up on order status',
+    discussion: 'Followed up via Facebook chat to provide tracking number.',
+    output: 'Customer confirmed receipt of the tracking number.',
+    nextAction: 'Monitor delivery status.',
     ticketId: 'TKT-001'
   },
   {
@@ -55,7 +59,10 @@ const interactions: Interaction[] = [
     channel: 'System',
     date: '2024-07-23T10:05:00Z',
     agent: agents[1],
-    content: 'Customer confirmed receipt of tracking number. Marked ticket as resolved.',
+    purpose: 'Internal Note',
+    discussion: 'Customer confirmed receipt of tracking number. Marked ticket as resolved.',
+    output: '',
+    nextAction: '',
     ticketId: 'TKT-001'
   },
   {
@@ -73,7 +80,10 @@ const interactions: Interaction[] = [
     channel: 'System',
     date: '2024-06-15T11:00:00Z',
     agent: agents[0],
-    content: 'Customer called to update their prescription details. Updated Eye Measurement profile.'
+    purpose: 'Profile Update',
+    discussion: 'Customer called to update their prescription details.',
+    output: 'Updated Eye Measurement profile.',
+    nextAction: 'None.'
   },
   {
     id: 'int-7',
@@ -81,7 +91,10 @@ const interactions: Interaction[] = [
     channel: 'Zalo',
     date: '2024-05-30T17:20:00Z',
     agent: agents[2],
-    content: 'Customer asked about our return policy. Sent them a link to the FAQ page.'
+    purpose: 'Return Policy Inquiry',
+    discussion: 'Customer asked about our return policy.',
+    output: 'Sent them a link to the FAQ page.',
+    nextAction: 'None.'
   },
   {
     id: 'int-8',
@@ -93,7 +106,10 @@ const interactions: Interaction[] = [
     agent: agents[0],
     recordingUrl: '#',
     ticketId: 'TKT-003',
-    content: 'Customer called to request a return for order ORD-001. Claims the frames are not as expected.',
+    purpose: 'Return Request',
+    discussion: 'Customer called to request a return for order ORD-001. Claims the frames are not as expected.',
+    output: 'Return process initiated. Return label sent to customer.',
+    nextAction: 'Wait for customer to ship the item back.',
     events: [
         { id: 'evt-8-1', type: 'Initiated', date: '2024-07-24T10:59:58Z', agent: agents[0] },
         { id: 'evt-8-2', type: 'Ringing', date: '2024-07-24T11:00:00Z', agent: agents[0] },
@@ -129,8 +145,11 @@ const interactions: Interaction[] = [
     agent: agents[2],
     recordingUrl: '#',
     ticketId: 'TKT-005',
-    content: 'Customer called about a cracked lens on a recent order.',
-     events: [
+    purpose: 'Follow-up on Cracked Lens',
+    discussion: 'Called customer to confirm details about a cracked lens on a recent order.',
+    output: 'Confirmed shipping of a replacement lens.',
+    nextAction: 'Track replacement shipment.',
+    events: [
         { id: 'evt-11-1', type: 'Initiated', date: '2024-07-25T09:59:58Z', agent: agents[2] },
         { id: 'evt-11-2', type: 'Answered', date: '2024-07-25T10:00:05Z', agent: agents[2] },
         { id: 'evt-11-3', type: 'Ended', date: '2024-07-25T10:08:50Z', agent: agents[2] },
@@ -181,7 +200,10 @@ const interactions: Interaction[] = [
     duration: '2m 30s',
     agent: agents[0],
     ticketId: 'TKT-007',
-    content: 'Initiated call to discuss return of ORD-001.',
+    purpose: 'Return Discussion',
+    discussion: 'Initiated call to discuss return of ORD-001.',
+    output: 'Customer agreed to the return process.',
+    nextAction: 'Send return instructions email.',
     events: [
         { id: 'evt-16-1', type: 'Initiated', date: '2024-07-26T09:59:58Z', agent: agents[0] },
         { id: 'evt-16-2', type: 'Answered', date: '2024-07-26T10:00:05Z', agent: agents[0] },
@@ -195,7 +217,10 @@ const interactions: Interaction[] = [
     channel: 'Phone',
     date: '2024-07-26T12:00:00Z',
     agent: agents[1],
-    content: 'Missed call from customer.',
+    purpose: 'Missed Call',
+    discussion: 'Missed call from customer.',
+    output: '',
+    nextAction: 'Return the call.',
     events: [
         { id: 'evt-17-1', type: 'Initiated', date: '2024-07-26T11:59:58Z', agent: agents[0] },
         { id: 'evt-17-2', type: 'Ringing', date: '2024-07-26T12:00:00Z', agent: agents[0] },
@@ -212,7 +237,10 @@ const interactions: Interaction[] = [
     channel: 'Zalo',
     date: '2024-07-15T11:00:00Z',
     agent: agents[1],
-    content: 'Customer inquired about store opening hours.',
+    purpose: 'Store Hours Inquiry',
+    discussion: 'Customer inquired about store opening hours.',
+    output: 'Provided store hours.',
+    nextAction: 'None.',
     ticketId: 'TKT-008'
   },
   {
@@ -234,7 +262,10 @@ const interactions: Interaction[] = [
     agent: agents[2],
     recordingUrl: '#',
     ticketId: 'TKT-009',
-    content: 'Call regarding a payment reminder for an overdue invoice.',
+    purpose: 'Payment Reminder',
+    discussion: 'Call regarding a payment reminder for an overdue invoice.',
+    output: 'Customer promised to pay by end of day.',
+    nextAction: 'Check payment status tomorrow.',
     events: [
         { id: 'evt-20-1', type: 'Initiated', date: '2024-07-27T15:59:58Z', agent: agents[2] },
         { id: 'evt-20-2', type: 'Ringing', date: '2024-07-27T16:00:00Z', agent: agents[2] },
@@ -248,7 +279,10 @@ const interactions: Interaction[] = [
     channel: 'Zalo',
     date: '2024-07-28T10:00:00Z',
     agent: agents[0],
-    content: 'Chào bạn, mình có thể giúp gì cho bạn?',
+    purpose: 'General Inquiry',
+    discussion: 'Chào bạn, mình có thể giúp gì cho bạn?',
+    output: '',
+    nextAction: '',
     ticketId: 'TKT-010'
   },
   {
@@ -257,7 +291,10 @@ const interactions: Interaction[] = [
     channel: 'Zalo',
     date: '2024-07-28T10:01:00Z',
     agent: agents[0],
-    content: 'Bạn có muốn biết thêm về sản phẩm của chúng tôi không?',
+    purpose: 'Product Info',
+    discussion: 'Bạn có muốn biết thêm về sản phẩm của chúng tôi không?',
+    output: '',
+    nextAction: '',
     ticketId: 'TKT-010'
   }
 ];
@@ -397,9 +434,7 @@ const allTickets: Ticket[] = [
   }
 ];
 
-tickets.push(...allTickets);
-tickets.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
-
+const tickets: Ticket[] = [...allTickets].sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
 
 export let customers: Customer[] = [
   {
@@ -605,5 +640,4 @@ export const getTicketsForCustomer = (customerId: string): Ticket[] => allTicket
 export const allOrders: Order[] = customers.flatMap(c => c.orders);
 export const allProducts: string[] = [...new Set(customers.flatMap(c => c.orders).flatMap(o => o.items).map(i => i.name))];
     
-// This export needs to be here to avoid circular dependency issues in other files that use it.
-export { allTickets as tickets, interactions };
+export { tickets };
