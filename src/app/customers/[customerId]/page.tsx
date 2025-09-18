@@ -220,10 +220,9 @@ function CustomerProfileClient({ customerId }: { customerId: string }) {
 }
 
 export default function CustomerProfilePage({ params }: { params: { customerId: string } }) {
-  const { customerId } = params;
   return (
     <Suspense fallback={<div className="flex h-full w-full items-center justify-center"><Loader2 className="animate-spin" /></div>}>
-      <CustomerProfileClient customerId={customerId} />
+      <CustomerProfileClient customerId={params.customerId} />
     </Suspense>
   )
 }

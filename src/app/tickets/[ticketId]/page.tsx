@@ -262,11 +262,9 @@ function TicketDetailClient({ ticketId }: { ticketId: string }) {
 
 
 export default function TicketDetailPage({ params }: { params: { ticketId: string } }) {
-  const { ticketId } = params;
-
   return (
     <Suspense fallback={<div className="flex h-full w-full items-center justify-center"><Loader2 className="animate-spin" /></div>}>
-      <TicketDetailClient ticketId={ticketId} />
+      <TicketDetailClient ticketId={params.ticketId} />
     </Suspense>
   )
 }
