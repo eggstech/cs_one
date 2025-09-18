@@ -1,6 +1,5 @@
 
-'use client';
-import { useState, useEffect, Suspense } from 'react';
+import { Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import {
@@ -30,9 +29,11 @@ import { Combobox } from '@/components/ui/combobox';
 const ticketCategories = ['Order', 'Product', 'Staffs', 'Policy', 'Other'];
 
 function NewTicketForm() {
+  'use client';
   const router = useRouter();
   const searchParams = useSearchParams();
   const { toast } = useToast();
+  const { useState, useEffect } = require('react');
 
   const [customerId, setCustomerId] = useState(searchParams.get('customerId') || '');
   const [agentId, setAgentId] = useState('');
