@@ -27,7 +27,8 @@ import { useToast } from "@/hooks/use-toast";
 import { EditCustomerProfileDialog } from "@/components/customers/edit-customer-profile-dialog";
 import { Loader2 } from "lucide-react";
 
-function CustomerProfileClient({ customerId }: { customerId: string }) {
+function CustomerProfileClient({ params }: { params: { customerId: string } }) {
+  const { customerId } = params;
   const { toast } = useToast();
   const searchParams = useSearchParams();
   const isCallActive = searchParams.get('call') === 'true';
@@ -222,7 +223,7 @@ function CustomerProfileClient({ customerId }: { customerId: string }) {
 export default function CustomerProfilePage({ params }: { params: { customerId: string } }) {
   return (
     <Suspense fallback={<div className="flex h-full w-full items-center justify-center"><Loader2 className="animate-spin" /></div>}>
-      <CustomerProfileClient customerId={params.customerId} />
+      <CustomerProfileClient params={params} />
     </Suspense>
   )
 }

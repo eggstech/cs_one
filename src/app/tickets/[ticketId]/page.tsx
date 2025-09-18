@@ -65,7 +65,8 @@ const SlaInfo = ({ sla }: { sla: Ticket['sla'] }) => {
     )
 }
 
-function TicketDetailClient({ ticketId }: { ticketId: string }) {
+function TicketDetailClient({ params }: { params: { ticketId: string } }) {
+  const { ticketId } = params;
   const searchParams = useSearchParams();
   const isCallActive = searchParams.get('call') === 'true';
 
@@ -264,7 +265,7 @@ function TicketDetailClient({ ticketId }: { ticketId: string }) {
 export default function TicketDetailPage({ params }: { params: { ticketId: string } }) {
   return (
     <Suspense fallback={<div className="flex h-full w-full items-center justify-center"><Loader2 className="animate-spin" /></div>}>
-      <TicketDetailClient ticketId={params.ticketId} />
+      <TicketDetailClient params={params} />
     </Suspense>
   )
 }
