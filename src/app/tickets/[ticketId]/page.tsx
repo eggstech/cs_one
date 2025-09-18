@@ -64,7 +64,8 @@ const SlaInfo = ({ sla }: { sla: Ticket['sla'] }) => {
     )
 }
 
-export default function TicketDetailPage({ params: { ticketId } }: { params: { ticketId: string } }) {
+export default function TicketDetailPage({ params }: { params: { ticketId: string } }) {
+  const { ticketId } = params;
   const searchParams = useSearchParams();
   const isCallActive = searchParams.get('call') === 'true';
 

@@ -27,7 +27,8 @@ import { Customer, Interaction } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
 import { EditCustomerProfileDialog } from "@/components/customers/edit-customer-profile-dialog";
 
-export default function CustomerProfilePage({ params: { customerId } }: { params: { customerId: string } }) {
+export default function CustomerProfilePage({ params }: { params: { customerId: string } }) {
+  const { customerId } = params;
   const { toast } = useToast();
   const searchParams = useSearchParams();
   const isCallActive = searchParams.get('call') === 'true';
