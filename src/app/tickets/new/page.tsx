@@ -1,6 +1,6 @@
 
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import {
@@ -22,14 +22,14 @@ import {
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { customers, agents, allOrders, allProducts } from '@/lib/data';
-import { ArrowLeft, Phone } from 'lucide-react';
+import { ArrowLeft, Phone, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 import { Combobox } from '@/components/ui/combobox';
 
 const ticketCategories = ['Order', 'Product', 'Staffs', 'Policy', 'Other'];
 
-export default function NewTicketPage() {
+function NewTicketForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { toast } = useToast();
@@ -151,26 +151,7 @@ export default function NewTicketPage() {
 
 
   return (
-    <div className="flex-1 space-y-4 p-8 pt-6">
-      <div className="flex items-center space-x-4">
-        <Button variant="outline" size="icon" asChild>
-          <Link href="/tickets">
-            <ArrowLeft className="h-4 w-4" />
-          </Link>
-        </Button>
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">
-            {isFromCall ? `Initiate Call & Create Ticket` : `Create New Ticket`}
-            </h1>
-          <p className="text-muted-foreground">
-            {isFromCall 
-                ? `Fill in call details below. A ticket will be created automatically.`
-                : `Fill in the details below to open a new support ticket.`
-            }
-          </p>
-        </div>
-      </div>
-      <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit}>
         <Card>
           <CardHeader>
             <CardTitle>Ticket Details</CardTitle>
@@ -264,6 +245,37 @@ export default function NewTicketPage() {
           </CardFooter>
         </Card>
       </form>
+  );
+}
+
+
+export default function NewTicketPage() {
+    const searchParams = useSearchParams();
+    const isFromCall = !!searchParams.get('subject')?.includes('Phone Call');
+
+  return (
+    <div className="flex-1 space-y-4 p-8 pt-6">
+      <div className="flex items-center space-x-4">
+        <Button variant="outline" size="icon" asChild>
+          <Link href="/tickets">
+            <ArrowLeft className="h-4 w-4" />
+          </Link>
+        </Button>
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">
+            {isFromCall ? `Initiate Call & Create Ticket` : `Create New Ticket`}
+            </h1>
+          <p className="text-muted-foreground">
+            {isFromCall 
+                ? `Fill in call details below. A ticket will be created automatically.`
+                : `Fill in the details below to open a new support ticket.`
+            }
+          </p>
+        </div>
+      </div>
+      <Suspense fallback={<div className="flex justify-center items-center h-64"><Loader2 className="h-8 w-8 animate-spin" /></div>}>
+        <NewTicketForm />
+      </Suspense>
     </div>
   );
 }
